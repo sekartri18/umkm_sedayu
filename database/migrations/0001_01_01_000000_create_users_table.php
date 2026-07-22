@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            
+            // Penambahan kolom role untuk membedakan Admin, Penjual, dan Pembeli
+            $table->enum('role', ['admin', 'penjual', 'pembeli'])->default('pembeli');
+            
             $table->rememberToken();
             $table->timestamps();
         });

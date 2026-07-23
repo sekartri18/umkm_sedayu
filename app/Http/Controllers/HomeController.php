@@ -21,7 +21,9 @@ class HomeController extends Controller
     {
         // Mencari data UMKM berdasarkan ID beserta relasi kategorinya
         // Menggunakan findOrFail agar jika ID tidak ditemukan, langsung menampilkan error 404
-        $umkm = Umkm::with('category')->findOrFail($id);
+        $umkm = Umkm::with(['category', 'products' => function ($query) {
+            $query->latest();
+        }])->findOrFail($id);
 
         return view('umkm.detail', compact('umkm'));
     }

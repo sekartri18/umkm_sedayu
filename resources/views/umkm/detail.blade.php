@@ -29,7 +29,11 @@
 
     <!-- 2. Cover Image -->
     <div class="w-full h-64 bg-gray-300 mt-16 relative">
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+        @if($umkm->image)
+            <img src="{{ asset('storage/' . $umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+        @else
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+        @endif
         <div class="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
     </div>
 
@@ -59,45 +63,38 @@
         </div>
     </div>
 
-    <!-- 4. Katalog / Produk Dummy -->
+    <!-- 4. Katalog Produk -->
     <div class="px-4 py-6">
         <h3 class="text-lg font-bold mb-4">Katalog Produk</h3>
-        
-        <!-- Grid Produk -->
-        <div class="grid grid-cols-2 gap-3">
-            <!-- Contoh Card Produk Dummy 1 -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="h-32 bg-gray-200">
-                    <img src="https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=300&q=80" alt="Produk 1" class="w-full h-full object-cover">
-                </div>
-                <div class="p-3">
-                    <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">Celana Merah Pendek Anak Laki-Laki (Kasual)</h4>
-                    <p class="text-primary font-bold text-sm">Rp 45.000</p>
-                </div>
-            </div>
 
-            <!-- Contoh Card Produk Dummy 2 -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="h-32 bg-gray-200">
-                    <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=300&q=80" alt="Produk 2" class="w-full h-full object-cover">
-                </div>
-                <div class="p-3">
-                    <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">Kaus Katun Combed Premium (Berbagai Warna)</h4>
-                    <p class="text-primary font-bold text-sm">Rp 60.000</p>
-                </div>
+        @if($umkm->products->isEmpty())
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-center">
+                <p class="text-sm font-semibold text-gray-900">Belum ada produk di toko ini</p>
+                <p class="text-xs text-gray-500 mt-1">Produk yang ditambahkan penjual akan muncul otomatis di katalog ini.</p>
             </div>
-            
-            <!-- Contoh Card Produk Dummy 3 -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="h-32 bg-gray-200">
-                    <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=300&q=80" alt="Produk 3" class="w-full h-full object-cover">
-                </div>
-                <div class="p-3">
-                    <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">Setelan Harian Nyaman</h4>
-                    <p class="text-primary font-bold text-sm">Rp 85.000</p>
-                </div>
+        @else
+            <!-- Grid Produk -->
+            <div class="grid grid-cols-2 gap-3">
+                @foreach($umkm->products as $product)
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="h-32 bg-gray-200">
+                            @if($product->image)
+                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-gray-300">
+                                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="p-3">
+                            <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">{{ $product->name }}</h4>
+                            <p class="text-primary font-bold text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                            <p class="text-[11px] text-gray-500 mt-1">Stok: {{ $product->stock }}</p>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        </div>
+        @endif
     </div>
 
     <!-- 5. Floating Bottom Button dengan Logika Login -->

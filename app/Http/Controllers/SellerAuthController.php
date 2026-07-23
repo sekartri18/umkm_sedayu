@@ -8,6 +8,7 @@ use App\Models\Umkm;
 use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SellerAuthController extends Controller
 {
@@ -30,6 +31,7 @@ class SellerAuthController extends Controller
             'category_id' => 'required|exists:categories,id',
             'whatsapp_number' => 'required|string|max:20',
             'address' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         // 2. Buat Akun (Otomatis dapat role 'penjual')
@@ -41,6 +43,11 @@ class SellerAuthController extends Controller
         ]);
 
         // 3. Buat Profil Toko (UMKM) disambungkan ke Akun tadi
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('umkm', 'public');
+        }
+
         Umkm::create([
             'user_id' => $user->id,
             'category_id' => $request->category_id,
@@ -48,6 +55,7 @@ class SellerAuthController extends Controller
             'owner_name' => $request->name,
             'whatsapp_number' => $request->whatsapp_number,
             'address' => $request->address,
+            'image' => $imagePath,
         ]);
 
         // 4. Langsung Login-kan pengguna baru tersebut

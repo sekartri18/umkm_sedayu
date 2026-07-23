@@ -31,7 +31,7 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-xl px-4">
         <div class="bg-white py-8 px-6 shadow-sm sm:rounded-2xl sm:px-10 border border-gray-100">
-            <form action="{{ route('penjual.register') }}" method="POST" class="space-y-6">
+            <form action="{{ route('penjual.register') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 
                 <!-- Section 1: Informasi Akun -->
@@ -99,6 +99,18 @@
                                 <p class="text-[10px] text-gray-500 mt-1">Isi tanpa awalan 0, contoh: 812...</p>
                                 @error('whatsapp_number') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
+                        </div>
+
+                        <div>
+                            <label for="image" class="block text-sm font-medium text-gray-700">Foto Profil Toko</label>
+                            <div class="mt-1 flex items-center gap-4">
+                                <div class="w-20 h-20 rounded-2xl border border-dashed border-gray-300 bg-gray-50 overflow-hidden flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <input type="file" name="image" id="image" accept="image/*" class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                            </div>
+                            <p class="text-[11px] text-gray-500 mt-1">Opsional. Upload foto toko agar langsung tampil di dashboard dan halaman toko.</p>
+                            @error('image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>

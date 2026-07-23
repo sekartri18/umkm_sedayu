@@ -20,7 +20,12 @@ class SellerProductController extends Controller
             return redirect('/'); 
         }
 
-        return view('dashboard', compact('umkm'));
+        $umkm->load('category');
+        $umkm->loadCount('products');
+
+        $products = $umkm->products()->latest()->get();
+
+        return view('dashboard', compact('umkm', 'products'));
     }
 
     // 2. Fungsi index sekarang dikhususkan untuk Halaman "Produk" (Menampilkan Daftar Produk)

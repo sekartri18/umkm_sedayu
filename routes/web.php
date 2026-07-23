@@ -30,20 +30,27 @@ Route::middleware('guest')->group(function () {
 | Rute Admin & Penjual (Membutuhkan Login)
 |--------------------------------------------------------------------------
 */
-// Group Route untuk Dashboard dan Manajemen Produk (Hanya untuk yang sudah login)
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Rute Utama Dasbor (Statistik)
+    // Rute Dashboard
     Route::get('/dashboard', [SellerProductController::class, 'dashboard'])->name('dashboard');
     
-    // Rute Halaman List Produk
+    // Rute Manajemen Produk
     Route::get('/produk', [SellerProductController::class, 'index'])->name('produk.index');
     Route::get('/produk/tambah', [SellerProductController::class, 'create'])->name('produk.create');
     Route::post('/produk', [SellerProductController::class, 'store'])->name('produk.store');
+    Route::get('/produk/{id}/edit', [SellerProductController::class, 'edit'])->name('produk.edit');
+    Route::put('/produk/{id}', [SellerProductController::class, 'update'])->name('produk.update');
+    Route::delete('/produk/{id}', [SellerProductController::class, 'destroy'])->name('produk.destroy');
     
     // Rute Halaman Pesanan
     Route::get('/pesanan', function() {
         return view('seller.pesanan.index');
     })->name('pesanan.index');
+
+    // Rute Halaman Keuangan (Baru ditambahkan)
+    Route::get('/keuangan', function() {
+        return view('seller.keuangan.index');
+    })->name('keuangan.index');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {

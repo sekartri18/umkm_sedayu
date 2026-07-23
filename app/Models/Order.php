@@ -5,20 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Order extends Model
 {
     use HasFactory;
 
-    // Mengizinkan mass-assignment
     protected $guarded = [];
 
-    // Relasi: Produk dimiliki oleh satu UMKM
-    public function umkm()
+    protected $casts = [
+        'checked_out_at' => 'datetime',
+    ];
+
+    public function user()
     {
-        return $this->belongsTo(Umkm::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function orderItems()
+    public function items()
     {
         return $this->hasMany(OrderItem::class);
     }

@@ -6,6 +6,9 @@ use App\Http\Controllers\SellerProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminUmkmController;
 use App\Http\Controllers\SellerAuthController;
+use App\Http\Controllers\CartController;
+use App\Models\Order;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +17,13 @@ use App\Http\Controllers\SellerAuthController;
 */
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/umkm/{id}', [HomeController::class, 'show'])->name('umkm.show');
+Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+Route::post('/keranjang/{productId}', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/keranjang/{productId}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/keranjang/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::get('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+Route::post('/checkout', [CartController::class, 'processCheckout'])->name('cart.processCheckout');
+Route::get('/checkout/sukses', [CartController::class, 'success'])->name('cart.success');
 
 /*
 |--------------------------------------------------------------------------
@@ -44,7 +54,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Rute Halaman Pesanan
     Route::get('/pesanan', function() {
-        return view('seller.pesanan.index');
+        $user = Auth::user();
+        $umkm = $user->umkm;
+
+        $orders = Order::with(['items.product', 'items.umkm'])
+            ->whereHas('items', function ($query) use ($umkm) {
+                $query->where('umkm_id', $umkm->id);
+            })
+            ->latest('checked_out_at')
+            ->latest()
+            ->get();
+
+        return view('seller.pesanan.index', compact('orders', 'umkm'));
     })->name('pesanan.index');
 
     // Rute Halaman Keuangan (Baru ditambahkan)

@@ -18,14 +18,35 @@
     </script>
 </head>
 <body class="bg-gray-50 text-dark font-sans pb-24 antialiased">
+    @php
+        $cartItemCount = collect(session('cart', []))->sum('quantity');
+    @endphp
 
     <!-- 1. Header dengan Tombol Kembali -->
     <header class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 px-4 py-4 shadow-sm flex items-center gap-3">
         <a href="{{ url('/') }}" class="bg-gray-100 p-2 rounded-full text-gray-600 hover:text-primary transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
         </a>
-        <h1 class="text-lg font-bold truncate">{{ $umkm->name }}</h1>
+        <h1 class="text-lg font-bold truncate flex-1">{{ $umkm->name }}</h1>
+        <a href="{{ route('cart.index') }}" class="relative bg-emerald-50 p-2.5 rounded-full text-primary hover:bg-emerald-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2m0 0L7 13h10l3-8H5.4M7 13l-1 5h12m-9 3a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+            @if($cartItemCount > 0)
+                <span class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
+            @endif
+        </a>
     </header>
+
+    @if(session('success'))
+        <div class="fixed top-20 left-4 right-4 z-50">
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 text-sm font-medium shadow-sm">{{ session('success') }}</div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="fixed top-20 left-4 right-4 z-50">
+            <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm font-medium shadow-sm">{{ session('error') }}</div>
+        </div>
+    @endif
 
     <!-- 2. Cover Image -->
     <div class="w-full h-64 bg-gray-300 mt-16 relative">
@@ -50,6 +71,10 @@
                     {{ $umkm->address }}
                 </p>
             </div>
+
+            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-primary text-[11px] font-bold rounded-full">
+                {{ $umkm->products->count() }} Produk
+            </span>
         </div>
         
         <div class="mt-4">
@@ -64,7 +89,7 @@
     </div>
 
     <!-- 4. Katalog Produk -->
-    <div class="px-4 py-6">
+    <div class="px-4 py-6" id="katalog">
         <h3 class="text-lg font-bold mb-4">Katalog Produk</h3>
 
         @if($umkm->products->isEmpty())
@@ -74,7 +99,7 @@
             </div>
         @else
             <!-- Grid Produk -->
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 @foreach($umkm->products as $product)
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="h-32 bg-gray-200">
@@ -89,7 +114,17 @@
                         <div class="p-3">
                             <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">{{ $product->name }}</h4>
                             <p class="text-primary font-bold text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                            <p class="text-[11px] text-gray-500 mt-1">Stok: {{ $product->stock }}</p>
+                            <p class="text-[11px] text-gray-500 mt-1 mb-3">Stok: {{ $product->stock }}</p>
+
+                            @if($product->stock > 0)
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex items-center gap-2">
+                                    @csrf
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="w-full bg-primary hover:bg-emerald-600 text-white text-xs font-bold py-2 rounded-lg transition">+ Tambah ke Keranjang</button>
+                                </form>
+                            @else
+                                <button type="button" disabled class="w-full bg-gray-100 text-gray-400 text-xs font-bold py-2 rounded-lg cursor-not-allowed">Stok Habis</button>
+                            @endif
                         </div>
                     </div>
                 @endforeach
@@ -99,6 +134,16 @@
 
     <!-- 5. Floating Bottom Button dengan Logika Login -->
     <div class="fixed bottom-0 w-full bg-white border-t border-gray-100 p-4 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.1)]">
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <a href="{{ route('cart.index') }}" class="w-full bg-emerald-50 hover:bg-emerald-100 text-primary text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2m0 0L7 13h10l3-8H5.4"></path></svg>
+                Keranjang
+            </a>
+            <a href="{{ route('cart.checkout') }}" class="w-full bg-primary hover:bg-emerald-600 text-white text-sm font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+                Checkout
+            </a>
+        </div>
+
         @auth
             @php
                 $namaPembeli = auth()->user()->name;

@@ -6,6 +6,7 @@
     <title>Daftar Penjual - UMKM Sedayu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -113,11 +114,31 @@
                             @error('image') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        <!-- ---------------- BAGIAN ALAMAT & LINK MAPS ---------------- -->
                         <div>
-                            <label for="address" class="block text-sm font-medium text-gray-700">Alamat Lengkap Usaha</label>
-                            <textarea name="address" id="address" rows="3" required placeholder="Contoh: Dusun Krajan RT 01/RW 02, Desa Sedayu..." class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 text-sm focus:border-primary focus:ring-primary outline-none transition resize-none">{{ old('address') }}</textarea>
+                            <h4 class="block text-sm font-medium text-gray-700 mb-2">Lokasi Usaha <span class="text-red-500">*</span></h4>
+                            
+                            <div class="space-y-3 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                                <!-- Input Teks Alamat -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Jalan / Patokan (Tampil di Web)</label>
+                                    <input type="text" id="alamat_teks" required placeholder="Contoh: Pertigaan Cengang Kidul, Desa Sedayu..." class="block w-full rounded-lg border-gray-300 bg-white border p-2.5 text-sm focus:border-primary focus:ring-primary outline-none transition">
+                                </div>
+
+                                <!-- Input Link Maps -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Link Google Maps (Tujuan saat diklik)</label>
+                                    <input type="url" id="alamat_link" placeholder="Paste link share dari Google Maps (https://maps.app.goo.gl/...)" class="block w-full rounded-lg border-gray-300 bg-white border p-2.5 text-sm focus:border-primary focus:ring-primary outline-none transition">
+                                    <p class="text-[10px] text-gray-500 mt-1">Buka aplikasi Google Maps > Cari lokasi Anda > Klik Bagikan (Share) > Salin Tautan (Copy Link), lalu paste di sini.</p>
+                                </div>
+                                
+                                <!-- Input Tersembunyi (Dikirim ke Database) -->
+                                <input type="hidden" name="address" id="address_real" value="{{ old('address') }}">
+                            </div>
                             @error('address') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
+                        <!-- ----------------------------------------------------------- -->
+                        
                     </div>
                 </div>
 
@@ -137,5 +158,30 @@
             </div>
         </div>
     </div>
+
+    <!-- Script Penggabung Alamat dan Link -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputTeks = document.getElementById('alamat_teks');
+            const inputLink = document.getElementById('alamat_link');
+            const inputReal = document.getElementById('address_real');
+
+            function syncAddress() {
+                // Gabungkan teks dan link dengan pemisah khusus " ||| "
+                let teks = inputTeks.value.trim();
+                let link = inputLink.value.trim();
+                
+                if(link !== "") {
+                    inputReal.value = teks + " ||| " + link;
+                } else {
+                    inputReal.value = teks;
+                }
+            }
+
+            // Jalankan fungsi setiap kali penjual mengetik/paste
+            inputTeks.addEventListener('input', syncAddress);
+            inputLink.addEventListener('input', syncAddress);
+        });
+    </script>
 </body>
 </html>

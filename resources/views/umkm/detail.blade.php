@@ -20,6 +20,20 @@
 <body class="bg-gray-50 text-dark font-sans pb-24 antialiased">
     @php
         $cartItemCount = collect(session('cart', []))->sum('quantity');
+
+        // --- LOGIKA PEMISAH ALAMAT DAN LINK MAPS ---
+        $dataAlamat = $umkm->address ?? '';
+        $teksTampil = $dataAlamat;
+        // Default link jika penjual mendaftar sebelum ada fitur link (otomatis cari nama tokonya)
+        $linkMaps = "https://www.google.com/maps/search/?api=1&query=" . urlencode($umkm->name . ' ' . $dataAlamat);
+
+        // Jika sistem menemukan pemisah " ||| ", pisahkan teks dan link-nya
+        if (strpos($dataAlamat, ' ||| ') !== false) {
+            $pecah = explode(' ||| ', $dataAlamat);
+            $teksTampil = trim($pecah[0]); // Hanya ambil bagian teks ("Pertigaan Cengang Kidul")
+            $linkMaps = trim($pecah[1]);   // Hanya ambil bagian link ("https://maps...")
+        }
+        // -------------------------------------------
     @endphp
 
     <!-- 1. Header dengan Tombol Kembali -->
@@ -66,13 +80,18 @@
                     {{ $umkm->category->name }}
                 </span>
                 <h2 class="text-2xl font-bold leading-tight mb-1">{{ $umkm->name }}</h2>
-                <p class="text-sm text-gray-500 font-medium flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    {{ $umkm->address }}
-                </p>
+                
+                <!-- BAGIAN ALAMAT YANG SUDAH BERSIH (Hanya Teks, Tapi Bisa Diklik) -->
+                <a href="{{ $linkMaps }}" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="text-sm text-gray-500 font-medium flex items-start gap-1.5 hover:text-primary hover:underline transition-colors w-fit mt-1">
+                    <svg class="w-4 h-4 mt-0.5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span>{{ $teksTampil }}</span>
+                </a>
             </div>
 
-            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-primary text-[11px] font-bold rounded-full">
+            <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-primary text-[11px] font-bold rounded-full flex-shrink-0">
                 {{ $umkm->products->count() }} Produk
             </span>
         </div>
@@ -165,6 +184,5 @@
             {{ $teksTombol }}
         </a>
     </div>
-
 </body>
 </html>

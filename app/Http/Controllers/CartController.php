@@ -185,6 +185,7 @@ class CartController extends Controller
             return $order;
         });
 
+        // Menyimpan data checkout terakhir ke session (Untuk halaman sukses)
         session()->put(self::LAST_CHECKOUT_KEY, [
             'order_code' => $order->order_code,
             'customer_name' => $order->customer_name,
@@ -198,8 +199,43 @@ class CartController extends Controller
             'checkout_at' => optional($order->checked_out_at)->format('d M Y, H:i'),
         ]);
 
+        // Mengosongkan keranjang belanja
         session()->forget(self::CART_KEY);
 
+        // ---------------------------------------------------------
+        // LOGIKA MIDTRANS JIKA METODE PEMBAYARAN ADALAH TRANSFER
+        // ---------------------------------------------------------
+        if ($request->payment_method === 'transfer') {
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production');
+            \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+            \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->order_code,
+                    'gross_amount' => $order->subtotal,
+                ],
+                'customer_details' => [
+                    'first_name' => $order->customer_name,
+                    'phone' => $order->phone,
+                ],
+            ];
+
+            try {
+                // Meminta Snap Token ke Midtrans
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                
+                // Arahkan pembeli ke halaman transisi pop-up pembayaran
+                return view('cart.payment', compact('snapToken', 'order'));
+                
+            } catch (\Exception $e) {
+                // Jika server Midtrans sedang gangguan, kembalikan ke halaman awal dengan pesan error
+                return redirect()->route('cart.index')->with('error', 'Gagal memproses pembayaran Midtrans: ' . $e->getMessage());
+            }
+        }
+
+        // Jika metode COD, langsung ke halaman sukses
         return redirect()->route('cart.success');
     }
 

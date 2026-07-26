@@ -7,7 +7,7 @@
         <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
             <p class="text-sm font-medium text-emerald-100 mb-1 relative z-10">Saldo Aktif (Bisa Ditarik)</p>
-            <h3 class="text-3xl font-bold mb-4 relative z-10">Rp 4.500.000</h3>
+            <h3 class="text-3xl font-bold mb-4 relative z-10">Rp {{ number_format($saldoAktif, 0, ',', '.') }}</h3>
             <button class="bg-white text-emerald-600 text-sm font-bold py-2 px-4 rounded-lg w-full hover:bg-gray-50 transition relative z-10 shadow-sm">
                 Tarik Saldo
             </button>
@@ -21,7 +21,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-gray-500">Saldo Tertunda</p>
-                    <h3 class="text-xl font-bold text-gray-900">Rp 1.250.000</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Rp {{ number_format($saldoTertunda, 0, ',', '.') }}</h3>
                 </div>
             </div>
             <p class="text-xs text-gray-400 mt-2">Dana dari pesanan yang sedang diproses atau dikirim. Akan cair setelah pembeli mengonfirmasi pesanan diterima.</p>
@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-gray-500">Total Penghasilan</p>
-                    <h3 class="text-xl font-bold text-gray-900">Rp 15.750.000</h3>
+                    <h3 class="text-xl font-bold text-gray-900">Rp {{ number_format($totalPenghasilan, 0, ',', '.') }}</h3>
                 </div>
             </div>
             <p class="text-xs text-gray-400 mt-2">Total pendapatan keseluruhan sejak Anda membuka toko di UMKM Sedayu.</p>
@@ -58,44 +58,35 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
-                    <!-- Dummy Data 1 (Penghasilan Masuk) -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="py-4 px-4 text-sm text-gray-600">23 Jul 2026</td>
-                        <td class="py-4 px-4 text-sm font-medium text-gray-900">INV-89211</td>
-                        <td class="py-4 px-4 text-sm text-gray-600">
-                            Pencairan dana dari pesanan <span class="font-semibold">Celana Merah Pendek Anak Laki-Laki</span> (2 Pcs)
-                        </td>
-                        <td class="py-4 px-4 text-sm font-bold text-emerald-600">+ Rp 90.000</td>
-                        <td class="py-4 px-4 text-right text-sm">
-                            <span class="bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full text-xs font-bold">Berhasil</span>
-                        </td>
-                    </tr>
-
-                    <!-- Dummy Data 2 (Penarikan Dana) -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="py-4 px-4 text-sm text-gray-600">20 Jul 2026</td>
-                        <td class="py-4 px-4 text-sm font-medium text-gray-900">WD-20260720</td>
-                        <td class="py-4 px-4 text-sm text-gray-600">
-                            Penarikan Saldo ke Rekening Bank BRI (****1234)
-                        </td>
-                        <td class="py-4 px-4 text-sm font-bold text-red-500">- Rp 2.000.000</td>
-                        <td class="py-4 px-4 text-right text-sm">
-                            <span class="bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full text-xs font-bold">Selesai</span>
-                        </td>
-                    </tr>
                     
-                    <!-- Dummy Data 3 (Penghasilan Masuk) -->
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="py-4 px-4 text-sm text-gray-600">18 Jul 2026</td>
-                        <td class="py-4 px-4 text-sm font-medium text-gray-900">INV-89190</td>
-                        <td class="py-4 px-4 text-sm text-gray-600">
-                            Pencairan dana dari pesanan <span class="font-semibold">Baju Kemeja Flanel</span> (1 Pcs)
-                        </td>
-                        <td class="py-4 px-4 text-sm font-bold text-emerald-600">+ Rp 120.000</td>
-                        <td class="py-4 px-4 text-right text-sm">
-                            <span class="bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full text-xs font-bold">Berhasil</span>
-                        </td>
-                    </tr>
+                    @forelse($riwayatTransaksi as $transaksi)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-4 px-4 text-sm text-gray-600">
+                                {{ \Carbon\Carbon::parse($transaksi['tanggal'])->translatedFormat('d M Y') }}
+                            </td>
+                            <td class="py-4 px-4 text-sm font-medium text-gray-900">{{ $transaksi['id_referensi'] }}</td>
+                            <td class="py-4 px-4 text-sm text-gray-600">
+                                {!! $transaksi['keterangan'] !!}
+                            </td>
+                            <td class="py-4 px-4 text-sm font-bold {{ $transaksi['status'] === 'selesai' ? 'text-emerald-600' : 'text-orange-500' }}">
+                                + Rp {{ number_format($transaksi['nominal'], 0, ',', '.') }}
+                            </td>
+                            <td class="py-4 px-4 text-right text-sm">
+                                @if($transaksi['status'] === 'selesai')
+                                    <span class="bg-emerald-100 text-emerald-700 py-1 px-3 rounded-full text-[11px] font-bold uppercase tracking-wider">Selesai</span>
+                                @else
+                                    <span class="bg-orange-100 text-orange-700 py-1 px-3 rounded-full text-[11px] font-bold uppercase tracking-wider">Tertunda</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-sm text-gray-500">
+                                Belum ada riwayat transaksi tercatat.
+                            </td>
+                        </tr>
+                    @endforelse
+                    
                 </tbody>
             </table>
         </div>

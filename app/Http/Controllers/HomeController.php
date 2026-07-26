@@ -8,23 +8,29 @@ use App\Models\Category;
 
 class HomeController extends Controller
 {
+    // Menampilkan halaman Beranda (Menampilkan daftar UMKM & Kategori)
     public function index()
     {
-        // ... (kode index yang sudah ada sebelumnya) ...
+        // Mengambil data kategori dan UMKM untuk ditampilkan di halaman awal
         $categories = Category::all();
         $umkms = Umkm::with('category')->latest()->get();
+        
         return view('welcome', compact('categories', 'umkms'));
     }
 
-    // Method baru untuk Halaman Detail UMKM
+    // Menampilkan halaman Detail Toko UMKM
     public function show($id)
     {
-        // Mencari data UMKM berdasarkan ID beserta relasi kategorinya
-        // Menggunakan findOrFail agar jika ID tidak ditemukan, langsung menampilkan error 404
-        $umkm = Umkm::with(['category', 'products' => function ($query) {
-            $query->latest();
-        }])->findOrFail($id);
+        $umkm = Umkm::findOrFail($id);
 
-        return view('umkm.detail', compact('umkm'));
+        // FITUR PENGHITUNG PENGUNJUNG:
+        // Setiap kali rute ini diakses (baik oleh guest maupun user login),
+        // kolom 'views' pada toko UMKM ini akan otomatis bertambah 1
+        $umkm->increment('views');
+
+        // Mengambil data produk milik toko ini untuk ditampilkan ke pembeli
+        $products = $umkm->products()->latest()->get();
+
+        return view('umkm.detail', compact('umkm', 'products'));
     }
 }

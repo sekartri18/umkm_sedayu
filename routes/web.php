@@ -68,10 +68,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('seller.pesanan.index', compact('orders', 'umkm'));
     })->name('pesanan.index');
 
-    // Rute Halaman Keuangan (Baru ditambahkan)
-    Route::get('/keuangan', function() {
-        return view('seller.keuangan.index');
-    })->name('keuangan.index');
+    // Rute Halaman Keuangan
+    Route::get('/keuangan', [SellerProductController::class, 'keuangan'])->name('keuangan.index');
+
+    // Rute Halaman Pengaturan Toko
+    Route::get('/pengaturan', [SellerProductController::class, 'pengaturan'])->name('pengaturan.index');
+    Route::put('/pengaturan', [SellerProductController::class, 'updatePengaturan'])->name('pengaturan.update');
 });
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {

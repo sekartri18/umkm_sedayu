@@ -4,28 +4,88 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class SellerProductController extends Controller
 {
-    // 1. Fungsi baru untuk Halaman Dashboard (Menampilkan Statistik)
+    // 1. Fungsi untuk Halaman Dashboard (Menampilkan Statistik)
     public function dashboard()
     {
         $user = Auth::user();
         $umkm = $user->umkm;
 
-        // Proteksi ekstra: Jika bukan penjual (tidak punya UMKM), kembalikan ke Beranda
         if (!$umkm) { 
             return redirect('/'); 
         }
 
-        $umkm->load('category');
-        $umkm->loadCount('products');
+        /* 
+         * LOGIKA BARU: Karena tabel orders tidak memiliki umkm_id, 
+         * kita tarik data dari tabel order_items yang terhubung 
+         * dengan produk milik UMKM ini.
+         */
+        $completedItems = OrderItem::with(['product', 'order'])
+            ->whereHas('product', function($q) use ($umkm) {
+                $q->where('umkm_id', $umkm->id);
+            })
+            ->whereHas('order', function($q) {
+                $q->where('status', 'selesai');
+            })
+            ->get();
 
-        $products = $umkm->products()->latest()->get();
+        // 1. Hitung GMV (Total Pendapatan dari pesanan selesai)
+        $gmv = $completedItems->sum(function($item) {
+            // Cek harga dari order_item, jika kosong ambil dari harga master produk
+            $harga = $item->price ?? $item->product->price ?? 0;
+            return $harga * $item->quantity;
+        });
 
-        return view('dashboard', compact('umkm', 'products'));
+        // 2. Total Pembeli Unik
+        // Ambil ID order dari seluruh pesanan UMKM ini untuk melacak pembeli
+        $orderIds = OrderItem::whereHas('product', function($q) use ($umkm) {
+            $q->where('umkm_id', $umkm->id);
+        })->pluck('order_id');
+        
+        $totalPembeli = Order::whereIn('id', $orderIds)->distinct('user_id')->count('user_id');
+
+        // 3. Pesanan (SKU) - Total kuantitas barang terjual
+        $totalSKU = $completedItems->sum('quantity');
+
+        // 4. Pengunjung Toko 
+        $pengunjung = $umkm->views ?? 0;
+
+        // 5. Data Grafik Penjualan (12 Bulan Terakhir)
+        $grafikBulan = [];
+        $grafikPendapatan = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $grafikBulan[] = $date->translatedFormat('M Y'); 
+
+            // Filter koleksi data yang sudah ditarik sebelumnya agar lebih cepat (hemat Query)
+            $pendapatanBulanIni = $completedItems->filter(function($item) use ($date) {
+                if (!$item->order) return false;
+                $itemDate = Carbon::parse($item->order->created_at);
+                return $itemDate->year === $date->year && $itemDate->month === $date->month;
+            })->sum(function($item) {
+                $harga = $item->price ?? $item->product->price ?? 0;
+                return $harga * $item->quantity;
+            });
+
+            $grafikPendapatan[] = $pendapatanBulanIni;
+        }
+
+        // 6. Mengambil 4 produk terbaru untuk ditampilkan di bawah
+        $recentProducts = $umkm->products()->latest()->take(4)->get();
+
+        return view('dashboard', compact(
+            'umkm', 'gmv', 'totalPembeli', 'totalSKU', 'pengunjung', 
+            'grafikBulan', 'grafikPendapatan', 'recentProducts'
+        ));
     }
 
     // 2. Fungsi index sekarang dikhususkan untuk Halaman "Produk" (Menampilkan Daftar Produk)
@@ -41,7 +101,6 @@ class SellerProductController extends Controller
         // Mengambil semua produk milik UMKM tersebut
         $products = $umkm->products()->latest()->get();
 
-        // Mengarahkan ke file tampilan baru yang akan kita buat
         return view('seller.product.index', compact('umkm', 'products'));
     }
 
@@ -54,25 +113,20 @@ class SellerProductController extends Controller
     // 4. Memproses data input dan menyimpan foto ke database
     public function store(Request $request)
     {
-        // 1. Validasi Input (Ditambahkan validasi untuk stock)
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0', 
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096', // Maksimal ukuran 4MB
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096', 
         ]);
 
-        // 2. Proses Upload Gambar
         $imagePath = null;
         if ($request->hasFile('image')) {
-            // Gambar akan disimpan di folder storage/app/public/products
             $imagePath = $request->file('image')->store('products', 'public');
         }
 
-        // 3. Simpan Data Produk Baru (Ditambahkan penyimpanan stock)
         Product::create([
-            // Ambil ID UMKM dari penjual yang sedang login
             'umkm_id' => Auth::user()->umkm->id, 
             'name' => $request->name,
             'price' => $request->price,
@@ -81,7 +135,6 @@ class SellerProductController extends Controller
             'image' => $imagePath,
         ]);
 
-        // 4. Kembalikan ke Halaman Produk dengan pesan sukses
         return redirect()->route('produk.index')->with('success', 'Produk berhasil ditambahkan ke etalase!');
     }
 
@@ -90,7 +143,6 @@ class SellerProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Proteksi: Pastikan produk ini milik UMKM yang sedang login
         if ($product->umkm_id !== Auth::user()->umkm->id) {
             abort(403, 'Anda tidak memiliki akses ke produk ini.');
         }
@@ -107,7 +159,6 @@ class SellerProductController extends Controller
             abort(403);
         }
 
-        // Validasi Input (Ditambahkan validasi untuk stock)
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|integer|min:0',
@@ -116,7 +167,6 @@ class SellerProductController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
-        // Siapkan data yang akan diupdate (Ditambahkan pembaruan stock)
         $data = [
             'name' => $request->name,
             'price' => $request->price,
@@ -124,13 +174,10 @@ class SellerProductController extends Controller
             'description' => $request->description,
         ];
 
-        // Jika penjual mengunggah gambar baru
         if ($request->hasFile('image')) {
-            // Hapus gambar lama dari server jika ada
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            // Simpan gambar baru
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
@@ -148,14 +195,127 @@ class SellerProductController extends Controller
             abort(403);
         }
 
-        // Hapus file gambar dari server
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
 
-        // Hapus data dari database
         $product->delete();
 
         return redirect()->route('produk.index')->with('success', 'Produk berhasil dihapus dari etalase!');
+    }
+
+    // 8. Halaman Keuangan (Menghitung Saldo dan Riwayat)
+    public function keuangan()
+    {
+        $user = Auth::user();
+        $umkm = $user->umkm;
+
+        if (!$umkm) { return redirect('/'); }
+
+        // Tarik semua pesanan (order_items) milik UMKM ini
+        $orderItems = OrderItem::with(['order', 'product'])
+            ->whereHas('product', function($q) use ($umkm) {
+                $q->where('umkm_id', $umkm->id);
+            })
+            ->latest()
+            ->get();
+
+        $saldoAktif = 0;
+        $saldoTertunda = 0;
+        $riwayatTransaksi = [];
+
+        foreach ($orderItems as $item) {
+            if (!$item->order) continue;
+
+            // Hitung harga per item (prioritas dari order_item, jika kosong ambil dari master produk)
+            $harga = $item->price ?? $item->product->price ?? 0;
+            $totalSatuItem = $harga * $item->quantity;
+            $statusPesanan = strtolower($item->order->status);
+
+            // Klasifikasi Saldo
+            if ($statusPesanan === 'selesai') {
+                $saldoAktif += $totalSatuItem;
+            } else {
+                $saldoTertunda += $totalSatuItem;
+            }
+
+            // Masukkan ke array Riwayat Transaksi
+            $riwayatTransaksi[] = [
+                'tanggal' => $item->created_at,
+                'id_referensi' => $item->order->order_code,
+                'keterangan' => 'Penjualan produk ' . $item->product->name . ' (' . $item->quantity . ' Pcs)',
+                'nominal' => $totalSatuItem,
+                'status' => $statusPesanan,
+            ];
+        }
+
+        // Total Penghasilan adalah seluruh pesanan yang sudah selesai (Saldo Aktif)
+        $totalPenghasilan = $saldoAktif;
+
+        // Ubah array ke Collection agar mudah di-sorting dan di-loop di blade
+        $riwayatTransaksi = collect($riwayatTransaksi)->sortByDesc('tanggal');
+
+        return view('seller.keuangan.index', compact('saldoAktif', 'saldoTertunda', 'totalPenghasilan', 'riwayatTransaksi'));
+    }
+
+    // 9. Menampilkan Halaman Pengaturan Toko
+    public function pengaturan()
+    {
+        $user = Auth::user();
+        $umkm = $user->umkm;
+
+        if (!$umkm) { return redirect('/'); }
+
+        return view('seller.pengaturan.index', compact('umkm'));
+    }
+
+    // 10. Memproses Pembaruan Profil Toko
+    // 10. Memproses Pembaruan Profil Toko & Keamanan
+    public function updatePengaturan(Request $request)
+    {
+        $user = Auth::user();
+        $umkm = $user->umkm;
+
+        if (!$umkm) { return redirect('/'); }
+
+        // Validasi input form
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'whatsapp_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string',
+            'maps_link' => 'nullable|url', // Validasi harus berupa link URL
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            
+            // Validasi kata sandi (Hanya wajib jika kolom password baru diisi)
+            'current_password' => 'nullable|required_with:password|current_password',
+            'password' => 'nullable|min:8|confirmed',
+        ]);
+
+        // 1. Proses Update Password Akun (Jika pengguna mengisi form kata sandi)
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+        }
+
+        // 2. Proses Update Profil Toko
+        $data = [
+            'name' => $request->name,
+            'whatsapp_number' => $request->whatsapp_number,
+            'address' => $request->address,
+            'maps_link' => $request->maps_link,
+        ];
+
+        // Jika penjual mengunggah foto profil toko baru
+        if ($request->hasFile('image')) {
+            if ($umkm->image) {
+                Storage::disk('public')->delete($umkm->image);
+            }
+            $data['image'] = $request->file('image')->store('umkm', 'public');
+        }
+
+        $umkm->update($data);
+
+        return redirect()->route('pengaturan.index')->with('success', 'Profil toko dan pengaturan keamanan berhasil diperbarui!');
     }
 }

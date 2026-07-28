@@ -9,13 +9,21 @@ use App\Models\Category;
 class HomeController extends Controller
 {
     // Menampilkan halaman Beranda (Menampilkan daftar UMKM & Kategori)
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil data kategori dan UMKM untuk ditampilkan di halaman awal
         $categories = Category::all();
-        $umkms = Umkm::with('category')->latest()->get();
+        $banners = \App\Models\Banner::latest()->get(); // Ambil data banner terbaru
         
-        return view('welcome', compact('categories', 'umkms'));
+        $query = Umkm::with('category')->where('status', 'approved');
+
+        if ($request->has('search') && $request->search != '') {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $umkms = $query->latest()->get();
+        
+        // Tambahkan variabel $banners ke view
+        return view('welcome', compact('categories', 'umkms', 'banners'));
     }
 
     // Menampilkan halaman Detail Toko UMKM

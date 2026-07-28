@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UMKM Sedayu - Direktori Produk Lokal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,221 +13,397 @@
                     fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: { primary: '#10B981', dark: '#1F2937' },
                     boxShadow: {
-                        soft: '0 10px 30px -12px rgba(16, 185, 129, 0.35)'
+                        soft: '0 10px 30px -12px rgba(16, 185, 129, 0.35)',
+                        up: '0 -4px 20px -10px rgba(0,0,0,0.1)'
                     }
                 }
             }
         }
     </script>
     <style>
+        body { background-color: #f3f4f6; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .hero-glow {
-            background: radial-gradient(circle at 15% 20%, rgba(16,185,129,0.25), transparent 45%),
-                        radial-gradient(circle at 90% 10%, rgba(52,211,153,0.22), transparent 40%),
-                        linear-gradient(145deg, #047857 0%, #10B981 45%, #34D399 100%);
-        }
-        .stagger {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: rise .55s ease-out forwards;
-        }
-        .stagger:nth-child(2) { animation-delay: .08s; }
-        .stagger:nth-child(3) { animation-delay: .16s; }
-        .stagger:nth-child(4) { animation-delay: .24s; }
-        @keyframes rise {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
+        /* Animasi Transisi Slider */
+        .slide { transition: opacity 0.8s ease-in-out; }
+        .slide-active { opacity: 1; z-index: 10; }
+        .slide-hidden { opacity: 0; z-index: 0; pointer-events: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-dark font-sans pb-24 antialiased">
+<body class="text-dark font-sans antialiased">
     @php
         $cartItemCount = collect(session('cart', []))->sum('quantity');
+        
+        // Memetakan Ikon untuk kategori
+        $iconMap = [
+            'makanan' => '🍔',
+            'pakaian' => '👗',
+            'kerajinan' => '🧺',
+            'pertanian' => '🌾',
+            'jasa' => '🛠️',
+            'lainnya' => '📦'
+        ];
     @endphp
 
-    <div class="fixed inset-0 pointer-events-none -z-10">
-        <div class="absolute -top-20 -left-24 w-72 h-72 bg-emerald-200/45 blur-3xl rounded-full"></div>
-        <div class="absolute top-20 -right-16 w-72 h-72 bg-teal-200/35 blur-3xl rounded-full"></div>
-    </div>
-
-    <header class="sticky top-0 z-50 backdrop-blur bg-white/90 border-b border-emerald-50">
-        <div class="max-w-6xl mx-auto px-4 py-4">
-            <div class="flex items-center justify-between gap-3 mb-4">
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
-                    <span class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shadow-soft">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
-                    </span>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-extrabold text-primary leading-tight">UMKM Sedayu</h1>
-                        <p class="text-[11px] text-gray-500 leading-none">Belanja produk lokal warga</p>
-                    </div>
-                </a>
-
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <a href="{{ route('cart.index') }}" class="relative text-xs font-bold bg-white border border-emerald-100 text-primary px-3 py-2 rounded-full hover:bg-emerald-50 transition">
-                        Keranjang
-                        @if($cartItemCount > 0)
-                            <span class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-white text-[10px] flex items-center justify-center">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
-                        @endif
+    <!-- Container Utama (Responsif: Lebar di PC, menyesuaikan di HP) -->
+    <div class="max-w-7xl mx-auto bg-white min-h-screen relative shadow-sm pb-24 md:pb-10">
+        
+        <!-- HEADER & NAVIGASI ATAS -->
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 px-5 pt-4 pb-3 md:py-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                
+                <div class="flex items-center justify-between">
+                    <!-- Logo & Judul -->
+                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
+                        <span class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-soft">
+                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
+                        </span>
+                        <div>
+                            <h1 class="text-base md:text-xl font-extrabold text-primary leading-tight">UMKM Sedayu</h1>
+                        </div>
                     </a>
 
-                    @auth
-                        <span class="hidden sm:inline-flex text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-2 rounded-full">
-                            Halo, {{ auth()->user()->name }}
-                        </span>
-                        @if(auth()->user()->umkm)
-                            <a href="{{ route('dashboard') }}" class="text-xs font-bold bg-emerald-100 text-primary px-3 py-2 rounded-full hover:bg-emerald-200 transition">Dashboard Toko</a>
-                        @endif
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-xs font-bold bg-gray-800 text-white px-3 py-2 rounded-full hover:bg-gray-700 transition">Logout</button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="text-xs font-semibold text-gray-700 hover:text-primary transition">Masuk</a>
+                    <!-- Ikon Keranjang & Profil (Versi Mobile, pindah ke kanan di PC) -->
+                    <div class="flex items-center gap-3 md:hidden">
+                        <a href="{{ route('cart.index') }}" class="relative text-gray-600 hover:text-primary transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            @if($cartItemCount > 0)
+                                <span class="absolute -top-1 -right-1.5 min-w-[16px] h-[16px] px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-white">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
+                            @endif
+                        </a>
+
                         <div class="relative">
-                            <button id="tombolDaftar" class="text-xs font-bold bg-primary text-white px-4 py-2 rounded-full hover:bg-emerald-600 transition shadow-sm flex items-center gap-1">
-                                Daftar
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <button id="tombolDaftarMobile" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                             </button>
-                            <div id="menuDaftar" class="hidden absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
-                                <a href="{{ route('register') }}" class="block px-4 py-3 text-xs font-medium text-gray-700 hover:bg-emerald-50 hover:text-primary border-b border-gray-50 transition">Daftar Pembeli</a>
-                                <a href="{{ route('penjual.register') }}" class="block px-4 py-3 text-xs font-medium text-gray-700 hover:bg-emerald-50 hover:text-primary transition">Buka Toko (Penjual)</a>
+                            <div id="menuDaftarMobile" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                                @auth
+                                    <div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                                        <p class="text-[10px] text-gray-500 font-medium">Masuk sebagai</p>
+                                        <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                                    </div>
+                                    @if(auth()->user()->umkm)
+                                        <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
+                                    @endif
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left block px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition">Logout</button>
+                                    </form>
+                                @else
+                                    <a href="{{ route('login') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-primary transition border-b border-gray-50">Masuk Akun</a>
+                                    <a href="{{ route('register') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-primary transition border-b border-gray-50">Daftar Pembeli</a>
+                                    <a href="{{ route('penjual.register') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary bg-emerald-50/50 hover:bg-emerald-50 transition">Buka Toko (Penjual)</a>
+                                @endauth
                             </div>
                         </div>
-                    @endauth
+                    </div>
                 </div>
-            </div>
 
-            <div class="relative">
-                <input type="text" placeholder="Cari produk, kategori, atau nama UMKM..." class="w-full bg-emerald-50/70 border border-emerald-100 text-sm rounded-2xl py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/40">
-                <svg class="w-4 h-4 text-emerald-500 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
-        </div>
-    </header>
+                <!-- Form Pencarian (Fungsional) -->
+                <form action="{{ url('/') }}" method="GET" class="relative flex-1 max-w-2xl w-full">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk, kategori, atau nama UMKM..." class="w-full bg-gray-50 border border-gray-200 text-[13px] md:text-sm rounded-xl py-2.5 md:py-3 pl-10 pr-12 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition">
+                    <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-400 absolute left-3.5 top-3 md:top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <button type="submit" class="absolute right-2 top-1.5 md:top-2 bg-primary hover:bg-emerald-600 text-white p-1.5 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </form>
 
-    <main class="max-w-6xl mx-auto px-4">
-        <section class="mt-5 hero-glow rounded-3xl p-6 sm:p-8 text-white shadow-soft overflow-hidden relative">
-            <div class="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-14 translate-x-16"></div>
-            <div class="absolute bottom-0 left-0 w-52 h-52 bg-black/10 rounded-full translate-y-20 -translate-x-16"></div>
-            <div class="relative z-10 max-w-2xl">
-                <p class="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-50 mb-3">Pasar Digital Sedayu</p>
-                <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3">Belanja Lebih Dekat, Langsung dari Pelaku UMKM Desa</h2>
-                <p class="text-sm sm:text-base text-emerald-50/95 mb-6">Temukan produk pilihan warga Sedayu, hubungi penjual dengan cepat, dan bantu ekonomi lokal tumbuh setiap hari.</p>
-                <div class="flex flex-wrap gap-3">
-                    <a href="#umkm-list" class="bg-white text-primary font-bold px-5 py-2.5 rounded-full text-sm hover:bg-emerald-50 transition">Jelajahi Toko</a>
-                    <a href="#kategori" class="bg-black/20 text-white font-bold px-5 py-2.5 rounded-full text-sm hover:bg-black/30 transition">Lihat Kategori</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="kategori" class="mt-8">
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-lg font-bold text-gray-900">Kategori Populer</h3>
-                <span class="text-xs text-gray-500">{{ $categories->count() }} kategori</span>
-            </div>
-            <div class="flex gap-2 overflow-x-auto hide-scroll pb-2">
-                @foreach($categories as $category)
-                    <a href="#" class="stagger shrink-0 inline-flex items-center gap-2 bg-white border border-emerald-100 text-gray-700 rounded-full px-4 py-2 text-xs font-semibold hover:border-emerald-300 hover:text-primary transition">
-                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-primary flex items-center justify-center">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                        </span>
-                        {{ $category->name }}
+                <!-- Ikon Keranjang & Profil (Versi Desktop) -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="{{ route('cart.index') }}" class="relative flex items-center gap-2 text-gray-600 hover:text-primary transition font-medium">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Keranjang
+                        @if($cartItemCount > 0)
+                            <span class="absolute -top-1.5 -left-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
+                        @endif
                     </a>
-                @endforeach
-            </div>
-        </section>
 
-        <section id="umkm-list" class="mt-8 pb-4">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-extrabold text-gray-900">UMKM Pilihan Hari Ini</h3>
-                <span class="text-xs bg-emerald-100 text-primary font-bold px-3 py-1.5 rounded-full">{{ $umkms->count() }} toko aktif</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                @foreach($umkms as $umkm)
-                    <article class="stagger bg-white rounded-2xl border border-emerald-50 overflow-hidden shadow-sm hover:shadow-soft transition duration-300 flex flex-col">
-                        <a href="{{ route('umkm.show', $umkm->id) }}" class="block">
-                            <div class="h-44 bg-gray-200 relative overflow-hidden">
-                                @if($umkm->image)
-                                    <img src="{{ asset('storage/' . $umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+                    <div class="relative">
+                        <button id="tombolDaftarDesktop" class="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-100 transition focus:outline-none">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span class="text-sm font-semibold">{{ auth()->check() ? auth()->user()->name : 'Masuk / Daftar' }}</span>
+                        </button>
+                        <div id="menuDaftarDesktop" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50">
+                            @auth
+                                <div class="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                                    <p class="text-[10px] text-gray-500 font-medium">Masuk sebagai</p>
+                                    <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                                </div>
+                                @if(auth()->user()->umkm)
+                                    <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
                                 @endif
-                                <div class="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/45 to-transparent">
-                                    <span class="inline-flex bg-white/95 text-primary text-[11px] font-bold px-2.5 py-1 rounded-full">{{ $umkm->category->name }}</span>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left block px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition">Logout</button>
+                                </form>
+                            @else
+                                <a href="{{ route('login') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-primary transition border-b border-gray-50">Masuk Akun</a>
+                                <a href="{{ route('register') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-primary transition border-b border-gray-50">Daftar Pembeli</a>
+                                <a href="{{ route('penjual.register') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary bg-emerald-50/50 hover:bg-emerald-50 transition">Buka Toko (Penjual)</a>
+                            @endauth
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </header>
+
+        <div class="px-5 md:px-8 max-w-5xl mx-auto">
+            <!-- 1. HERO BANNER (SLIDER OTOMATIS & MANUAL DARI DATABASE) -->
+            <div class="relative w-full h-44 md:h-80 lg:h-96 rounded-2xl overflow-hidden shadow-sm mt-4 md:mt-8 mb-8 group" id="slider-container">
+                
+                @if($banners->isEmpty())
+                    <!-- Fallback Banner Jika Admin Belum Mengunggah Apa-apa -->
+                    <div class="slide slide-active absolute inset-0 w-full h-full">
+                        <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=1200&q=80" alt="Banner Default" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent"></div>
+                        <div class="absolute inset-0 p-6 md:p-12 flex flex-col justify-center items-start">
+                            <h2 class="text-white text-lg md:text-4xl font-extrabold mb-3 leading-tight max-w-[200px] md:max-w-md">Belanja Langsung dari Pelaku UMKM Desa</h2>
+                        </div>
+                    </div>
+                @else
+                    <!-- Looping Data Banner Dinamis dari Database -->
+                    @foreach($banners as $index => $banner)
+                        <div class="slide {{ $index === 0 ? 'slide-active' : 'slide-hidden' }} absolute inset-0 w-full h-full">
+                            <img src="{{ asset('storage/' . $banner->image) }}" alt="{{ $banner->title }}" class="w-full h-full object-cover">
+                            <!-- Overlay Gelap Tipis agar Teks (Jika ada) lebih terbaca -->
+                            <div class="absolute inset-0 bg-black/20"></div>
+                        </div>
+                    @endforeach
+                @endif
+
+                <!-- Tombol Navigasi Manual -->
+                <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition z-20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition z-20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+
+                <!-- Indikator Slide -->
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                    @forelse($banners as $index => $banner)
+                        <div class="dot w-2 h-2 rounded-full {{ $index === 0 ? 'bg-white' : 'bg-white/40' }} transition cursor-pointer"></div>
+                    @empty
+                        <div class="dot w-2 h-2 rounded-full bg-white transition cursor-pointer"></div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- 2. KATEGORI MENU DENGAN IKON & PERTANIAN -->
+            <div id="kategori" class="mb-10 md:mb-14">
+                <div class="flex items-center justify-between mb-4 md:mb-6">
+                    <h3 class="font-bold text-gray-900 text-base md:text-xl">Kategori Populer</h3>
+                </div>
+                <!-- Grid fleksibel: scroll horizontal di HP, grid rapi di Laptop -->
+                <div class="flex md:grid md:grid-cols-6 gap-4 overflow-x-auto hide-scroll pb-2 snap-x">
+                    
+                    @foreach($categories as $category)
+                        @php
+                            $catKey = strtolower($category->name);
+                            // Cek apakah ada ikon di mapping, jika tidak gunakan logo box
+                            $icon = $iconMap[$catKey] ?? '📦';
+                        @endphp
+                        <a href="{{ url('/?search=' . $category->name) }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
+                            <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-emerald-50 flex items-center justify-center text-3xl md:text-4xl border border-emerald-100 shadow-sm group-hover:bg-primary group-hover:shadow-md transition duration-300">
+                                <span class="group-hover:scale-110 transition-transform">{{ $icon }}</span>
+                            </div>
+                            <span class="text-[11px] md:text-sm font-semibold text-gray-700 group-hover:text-primary text-center leading-tight">{{ $category->name }}</span>
+                        </a>
+                    @endforeach
+
+                    <!-- Penambahan Statis Kategori "Pertanian" Jika belum ada di Database -->
+                    @if(!$categories->contains('name', 'Pertanian') && !$categories->contains('name', 'pertanian'))
+                        <a href="{{ url('/?search=Pertanian') }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
+                            <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-emerald-50 flex items-center justify-center text-3xl md:text-4xl border border-emerald-100 shadow-sm group-hover:bg-primary group-hover:shadow-md transition duration-300">
+                                <span class="group-hover:scale-110 transition-transform">🌾</span>
+                            </div>
+                            <span class="text-[11px] md:text-sm font-semibold text-gray-700 group-hover:text-primary text-center leading-tight">Pertanian</span>
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- 3. UMKM PILIHAN -->
+            <div id="umkm-list" class="mb-10 md:mb-14">
+                <div class="flex justify-between items-end mb-4 md:mb-6">
+                    <h3 class="font-bold text-gray-900 text-base md:text-xl">UMKM Pilihan</h3>
+                    <!-- Tombol Lihat Semua yang mengarah ke pencarian kosong (menampilkan semua UMKM) -->
+                    <a href="{{ url('/?search=') }}" class="text-[11px] md:text-sm font-bold text-primary hover:text-emerald-700 hover:underline">Lihat Semua ></a>
+                </div>
+                
+                <div class="flex md:grid md:grid-cols-4 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 snap-x hide-scroll">
+                    @forelse($umkms->take(5) as $umkm)
+                        <a href="{{ route('umkm.show', $umkm->id) }}" class="min-w-[150px] md:min-w-0 md:w-full bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden snap-start block hover:-translate-y-1 hover:shadow-md transition-all">
+                            <div class="h-32 md:h-40 bg-gray-100 relative">
+                                @if($umkm->image)
+                                    <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover opacity-50">
+                                @endif
+                            </div>
+                            <div class="p-3 md:p-4">
+                                <h4 class="font-bold text-[13px] md:text-base text-gray-900 line-clamp-1 mb-1 md:mb-2">{{ $umkm->name }}</h4>
+                                <span class="inline-block bg-emerald-50 text-primary text-[9px] md:text-[10px] font-bold px-2 py-0.5 md:py-1 rounded uppercase tracking-wider mb-2">
+                                    {{ $umkm->category->name ?? 'Lainnya' }}
+                                </span>
+                                <div class="flex items-center gap-1 text-[10px] md:text-xs font-medium text-gray-500 truncate">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    <span class="text-gray-700 font-semibold">4.8</span>
+                                    <span class="mx-0.5 md:mx-1">•</span>
+                                    <span class="truncate">{{ Str::limit(str_replace(['Jalan ', 'Desa '], '', $umkm->address), 15) }}</span>
                                 </div>
                             </div>
                         </a>
-
-                        <div class="p-4 flex-1 flex flex-col">
-                            <a href="{{ route('umkm.show', $umkm->id) }}" class="font-bold text-gray-900 text-base line-clamp-1 hover:text-primary transition">{{ $umkm->name }}</a>
-                            <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ $umkm->address }}</p>
-
-                            <div class="mt-3 flex items-center justify-between text-[11px] text-gray-500">
-                                <span class="inline-flex items-center gap-1"><span class="text-yellow-400">★</span>4.8</span>
-                                <span class="inline-flex items-center gap-1 text-emerald-600 font-semibold">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path></svg>
-                                    UMKM Terverifikasi
-                                </span>
-                            </div>
-
-                            <div class="mt-4 grid grid-cols-2 gap-2">
-                                <a href="{{ route('umkm.show', $umkm->id) }}" class="text-center text-xs font-bold bg-emerald-50 text-primary py-2 rounded-lg hover:bg-emerald-100 transition">Lihat Toko</a>
-
-                                @auth
-                                    @php
-                                        $namaPembeli = auth()->user()->name;
-                                        $pesan = "Halo " . $umkm->name . ", saya " . $namaPembeli . " melihat usaha Anda di website UMKM Sedayu dan tertarik untuk bertanya lebih lanjut.";
-                                        $actionUrl = "https://wa.me/" . $umkm->whatsapp_number . "?text=" . urlencode($pesan);
-                                        $target = "_blank";
-                                    @endphp
-                                @else
-                                    @php
-                                        $actionUrl = route('login');
-                                        $target = "_self";
-                                    @endphp
-                                @endauth
-
-                                <a href="{{ $actionUrl }}" target="{{ $target }}" class="text-center text-xs font-bold bg-primary text-white py-2 rounded-lg hover:bg-emerald-600 transition">Hubungi</a>
-                            </div>
+                    @empty
+                        <div class="col-span-full py-10 text-center text-gray-500">
+                            Pencarian tidak menemukan UMKM yang sesuai.
                         </div>
-                    </article>
-                @endforeach
+                    @endforelse
+                </div>
             </div>
-        </section>
-    </main>
 
-    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around py-3 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <a href="#" class="flex flex-col items-center text-primary">
-            <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-            <span class="text-[10px] font-medium">Beranda</span>
+            <!-- 4. BANNER PENDAFTARAN UMKM -->
+            <div class="mb-10 md:mb-14">
+                <a href="{{ route('penjual.register') }}" class="bg-primary rounded-2xl md:rounded-3xl p-5 md:p-8 flex justify-between items-center text-white relative overflow-hidden shadow-sm hover:shadow-md transition-shadow block">
+                    <div class="absolute right-0 top-0 w-32 h-32 md:w-64 md:h-64 bg-white opacity-10 rounded-full -mr-10 -mt-10 md:-mr-20 md:-mt-20"></div>
+                    <div class="relative z-10 w-3/4 md:w-1/2">
+                        <h3 class="font-bold text-[15px] md:text-2xl mb-1 md:mb-2">Punya Usaha di Sedayu?</h3>
+                        <p class="text-[11px] md:text-sm font-medium opacity-90 leading-snug">Daftarkan UMKM Anda sekarang, raih pelanggan lebih luas dan tingkatkan penjualan secara digital.</p>
+                    </div>
+                    <div class="relative z-10 w-12 h-12 md:w-16 md:h-16 bg-emerald-400 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 5. UMKM TERDEKAT -->
+            <div class="mb-4">
+                <div class="flex justify-between items-end mb-4 md:mb-6">
+                    <h3 class="font-bold text-gray-900 text-base md:text-xl">UMKM Terdekat</h3>
+                    <a href="{{ url('/?search=') }}" class="text-[11px] md:text-sm font-bold text-primary hover:text-emerald-700 hover:underline">Lihat Semua ></a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($umkms->skip(5)->take(6) as $umkm)
+                        <a href="{{ route('umkm.show', $umkm->id) }}" class="flex items-center gap-4 bg-white p-3 md:p-4 rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm hover:border-emerald-200 hover:shadow-md transition duration-300">
+                            <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-xl md:rounded-2xl overflow-hidden shrink-0">
+                                @if($umkm->image)
+                                    <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
+                                @else
+                                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover opacity-50">
+                                @endif
+                            </div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-bold text-[13px] md:text-base text-gray-900 line-clamp-1 mb-0.5 md:mb-1">{{ $umkm->name }}</h4>
+                                <span class="inline-block bg-gray-50 text-gray-600 text-[9px] md:text-[10px] font-extrabold px-1.5 py-0.5 md:px-2 md:py-1 rounded md:rounded-md mb-1.5 md:mb-2 uppercase tracking-wide">
+                                    {{ $umkm->category->name ?? 'Lainnya' }}
+                                </span>
+                                <div class="flex items-center gap-1 text-[10px] md:text-xs font-medium text-gray-500">
+                                    <svg class="w-3 h-3 md:w-4 md:h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    <span class="text-gray-700 font-semibold">4.9</span>
+                                    <span class="mx-0.5 md:mx-1">•</span>
+                                    <span class="truncate">0.3 km - {{ Str::limit(str_replace(['Desa '], '', $umkm->address), 12) }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div> <!-- End Container -->
+
+    <!-- 6. BOTTOM NAVIGATION (Hanya Muncul di Mobile/HP) -->
+    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around items-center h-16 shadow-up z-50">
+        <a href="/" class="flex flex-col items-center justify-center w-full h-full text-primary relative">
+            <div class="absolute top-0 w-8 h-1 bg-primary rounded-b-full"></div>
+            <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <span class="text-[9px] font-bold">Beranda</span>
         </a>
-        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-primary transition">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span class="text-[10px] font-medium">Kategori</span>
+        <a href="#kategori" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span class="text-[9px] font-medium">Kategori</span>
         </a>
-        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-primary transition">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span class="text-[10px] font-medium">Bantuan</span>
+        <a href="{{ route('cart.index') }}" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition relative">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            <span class="text-[9px] font-medium">Keranjang</span>
+            @if($cartItemCount > 0)
+                <span class="absolute top-1 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center border-2 border-white">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
+            @endif
         </a>
     </nav>
 
+    <!-- Script Utama (Slider & Dropdown) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const tombolDaftar = document.getElementById('tombolDaftar');
-            const menuDaftar = document.getElementById('menuDaftar');
+            
+            // 1. Logika Dropdown Akun (Mobile & Desktop)
+            const setupDropdown = (btnId, menuId) => {
+                const btn = document.getElementById(btnId);
+                const menu = document.getElementById(menuId);
+                if (btn && menu) {
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); menu.classList.toggle('hidden'); });
+                    document.addEventListener('click', (e) => {
+                        if (!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden');
+                    });
+                }
+            };
+            setupDropdown('tombolDaftarMobile', 'menuDaftarMobile');
+            setupDropdown('tombolDaftarDesktop', 'menuDaftarDesktop');
 
-            if (tombolDaftar && menuDaftar) {
-                tombolDaftar.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    menuDaftar.classList.toggle('hidden');
-                });
+            // 2. Logika Slider Hero Banner
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentSlide = 0;
+            let slideInterval;
 
-                document.addEventListener('click', function(event) {
-                    if (!tombolDaftar.contains(event.target) && !menuDaftar.contains(event.target)) {
-                        menuDaftar.classList.add('hidden');
+            const updateSlider = () => {
+                slides.forEach((slide, index) => {
+                    if(index === currentSlide) {
+                        slide.classList.remove('slide-hidden');
+                        slide.classList.add('slide-active');
+                        if(dots[index]) dots[index].classList.replace('bg-white/40', 'bg-white');
+                    } else {
+                        slide.classList.add('slide-hidden');
+                        slide.classList.remove('slide-active');
+                        if(dots[index]) dots[index].classList.replace('bg-white', 'bg-white/40');
                     }
                 });
+            };
+
+            const nextSlide = () => { 
+                if(slides.length > 0) {
+                    currentSlide = (currentSlide + 1) % slides.length; 
+                    updateSlider(); 
+                }
+            };
+            
+            const prevSlide = () => { 
+                if(slides.length > 0) {
+                    currentSlide = (currentSlide - 1 + slides.length) % slides.length; 
+                    updateSlider(); 
+                }
+            };
+
+            // Tombol Navigasi Manual
+            if(nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetInterval(); });
+            if(prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetInterval(); });
+
+            // Klik dot indikator
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => { currentSlide = index; updateSlider(); resetInterval(); });
+            });
+
+            // Auto Play Slider (Setiap 5 detik)
+            const startInterval = () => { slideInterval = setInterval(nextSlide, 5000); };
+            const resetInterval = () => { clearInterval(slideInterval); startInterval(); };
+            
+            if(slides.length > 1) {
+                startInterval();
             }
         });
     </script>

@@ -9,8 +9,18 @@ class Umkm extends Model
 {
     use HasFactory;
 
-    // Mengizinkan semua kolom diisi secara massal (mass-assignment)
-    protected $guarded = [];
+    // Menggunakan $fillable jauh lebih aman daripada $guarded = [] 
+    // untuk mencegah manipulasi data (Mass-Assignment Vulnerability)
+    protected $fillable = [
+        'user_id',
+        'category_id',
+        'name',
+        'whatsapp_number',
+        'address',
+        'maps_link', // Link Google Maps
+        'image',
+        'status',    // Kolom verifikasi Admin (pending, approved, suspended)
+    ];
 
     // Definisi relasi: Sebuah UMKM dimiliki oleh 1 Kategori (BelongsTo)
     public function category()

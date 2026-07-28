@@ -9,6 +9,10 @@ use App\Http\Controllers\SellerAuthController;
 use App\Http\Controllers\CartController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Middleware\IsAdmin;
+use App\Http\Controllers\AdminCategoryController;
+use App\Http\Controllers\AdminBannerController;
+use App\Http\Controllers\AdminOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,8 +45,21 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Rute Dashboard
-    Route::get('/dashboard', [SellerProductController::class, 'dashboard'])->name('dashboard');
+    
+    // Rute Dashboard Dinamis
+    Route::get('/dashboard', function () {
+        // Jika yang login adalah admin, tampilkan dasbor analitik
+        if (auth()->user()->role === 'admin') {
+            $totalUmkm = \App\Models\Umkm::where('status', 'approved')->count();
+            $totalCustomer = \App\Models\User::where('role', 'buyer')->count();
+            $gmv = \App\Models\Order::whereIn('status', ['success', 'settlement', 'berhasil'])->sum('subtotal');
+            
+            return view('dashboard', compact('totalUmkm', 'totalCustomer', 'gmv'));
+        }
+
+        // Jika yang login penjual/pembeli, panggil controller bawaan milikmu
+        return app(SellerProductController::class)->dashboard();
+    })->name('dashboard');
     
     // Rute Manajemen Produk
     Route::get('/produk', [SellerProductController::class, 'index'])->name('produk.index');
@@ -76,8 +93,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/pengaturan', [SellerProductController::class, 'updatePengaturan'])->name('pengaturan.update');
 });
 
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Rute Panel Khusus Admin
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () {
     Route::get('/umkm', [AdminUmkmController::class, 'index'])->name('admin.umkm.index');
+    Route::put('/umkm/{id}/status', [AdminUmkmController::class, 'updateStatus'])->name('admin.umkm.status');
+    Route::resource('/category', AdminCategoryController::class)->names('admin.category');
+    Route::resource('/banner', AdminBannerController::class)->names('admin.banner')->only(['index', 'store', 'destroy']);
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
 });
 
 /*

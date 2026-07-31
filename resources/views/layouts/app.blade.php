@@ -23,7 +23,7 @@
             <!-- Area Konten Utama -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 
-                <!-- Navbar Atas (Profile & Tombol Mobile) -->
+                <!-- Navbar Atas (Profil & Tombol Mobile) -->
                 <header class="bg-white shadow-sm border-b border-gray-100 z-10 no-print">
                     <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
                         <!-- Tombol Hamburger (Hanya tampil di HP) -->
@@ -50,9 +50,6 @@
                                     </button>
                                 </x-slot>
                                 <x-slot name="content">
-                                    <x-dropdown-link :href="route('profile.edit')">
-                                        {{ __('Profile') }}
-                                    </x-dropdown-link>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <x-dropdown-link :href="route('logout')"

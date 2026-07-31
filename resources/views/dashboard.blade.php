@@ -296,24 +296,46 @@
     <!-- ========================================== -->
     <x-app-layout>
         <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Dashboard Pembeli') }}
-            </h2>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Dashboard Pembeli') }}</h2>
+                    <p class="text-sm text-gray-500">Halo {{ auth()->user()->name }}, lihat ringkasan pesanan dan favorit Anda di bawah.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <a href="{{ route('dashboard') }}" class="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition">Dashboard</a>
+                    <a href="{{ route('buyer.orders') }}" class="rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">Pesanan Saya</a>
+                </div>
+            </div>
         </x-slot>
 
         <div class="py-12">
-            <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100">
-                    <div class="p-8 text-center flex flex-col items-center">
-                        <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="grid gap-6 lg:grid-cols-3">
+                    <div class="rounded-3xl border border-gray-100 bg-emerald-50 p-6 shadow-sm">
+                        <p class="text-sm font-semibold text-gray-500">Pesanan Aktif</p>
+                        <p class="mt-4 text-3xl font-black text-gray-900">0</p>
+                    </div>
+
+                    <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                        <p class="text-sm font-semibold text-gray-500">Menunggu Bayar</p>
+                        <p class="mt-4 text-3xl font-black text-gray-900">0</p>
+                    </div>
+
+                    <div class="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                        <p class="text-sm font-semibold text-gray-500">Barang Favorit</p>
+                        <p class="mt-4 text-3xl font-black text-gray-900">0</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Ringkasan Akun Pembeli</h3>
+                            <p class="text-sm text-gray-500 mt-1">Akses cepat ke daftar pesanan, favorit, dan informasi akun Anda.</p>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Selamat Datang, {{ auth()->user()->name }}!</h3>
-                        <p class="text-gray-500 mb-6">Akun pembeli Anda sudah aktif. Anda bisa mulai mencari dan membeli produk-produk UMKM terbaik dari warga Desa Sedayu.</p>
-                        
-                        <div class="flex gap-4">
-                            <a href="{{ url('/') }}" class="bg-primary hover:bg-emerald-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition">Mulai Belanja</a>
-                            <a href="{{ route('penjual.register') }}" class="bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 font-bold py-2.5 px-6 rounded-lg transition">Buka Toko Sendiri</a>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="{{ route('buyer.orders') }}" class="rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600 transition">Pesanan Saya</a>
+                            <a href="{{ url('/') }}" class="rounded-2xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">Mulai Belanja</a>
                         </div>
                     </div>
                 </div>

@@ -83,6 +83,9 @@
                                         <p class="text-[10px] text-gray-500 font-medium">Masuk sebagai</p>
                                         <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
                                     </div>
+                                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Profil</a>
+                                    <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
+                                    <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
                                     @if(auth()->user()->umkm)
                                         <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
                                     @endif
@@ -130,6 +133,9 @@
                                     <p class="text-[10px] text-gray-500 font-medium">Masuk sebagai</p>
                                     <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
                                 </div>
+                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Profil</a>
+                                <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
+                                <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
                                 @if(auth()->user()->umkm)
                                     <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
                                 @endif
@@ -322,16 +328,16 @@
             <svg class="w-5 h-5 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
             <span class="text-[9px] font-bold">Beranda</span>
         </a>
-        <a href="#kategori" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition">
-            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-            <span class="text-[9px] font-medium">Kategori</span>
-        </a>
         <a href="{{ route('cart.index') }}" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition relative">
             <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
             <span class="text-[9px] font-medium">Keranjang</span>
             @if($cartItemCount > 0)
                 <span class="absolute top-1 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center border-2 border-white">{{ $cartItemCount > 9 ? '9+' : $cartItemCount }}</span>
             @endif
+        </a>
+        <a href="{{ route('profile.edit') }}" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition">
+            <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A10.97 10.97 0 0112 15c2.485 0 4.773.78 6.879 2.104M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="text-[9px] font-medium">Profil</span>
         </a>
     </nav>
 

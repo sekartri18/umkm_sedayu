@@ -8,18 +8,22 @@ use App\Http\Controllers\AdminUmkmController;
 use App\Http\Controllers\SellerAuthController;
 use App\Http\Controllers\CartController;
 use App\Models\Order;
+use App\Models\Umkm;
+use App\Models\Banner;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminBannerController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\BuyerOrderController;
 
 /*
 |--------------------------------------------------------------------------
 | Rute Pengunjung (Guest & User)
 |--------------------------------------------------------------------------
 */
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/umkm/{id}', [HomeController::class, 'show'])->name('umkm.show');
 Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
 Route::post('/keranjang/{productId}', [CartController::class, 'add'])->name('cart.add');
@@ -57,8 +61,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return view('dashboard', compact('totalUmkm', 'totalCustomer', 'gmv'));
         }
 
-        // Jika yang login penjual/pembeli, panggil controller bawaan milikmu
-        return app(SellerProductController::class)->dashboard();
+            // Jika yang login adalah pembeli, arahkan ke halaman utama (hapus dashboard pembeli)
+            if (auth()->user()->role === 'buyer' || auth()->user()->role === 'pembeli') {
+                return redirect()->route('home');
+            }
+
+            // Jika yang login penjual (memiliki UMKM), panggil controller dashboard penjual
+            if (auth()->user()->umkm) {
+                return app(SellerProductController::class)->dashboard();
+            }
+
+            // Default fallback: arahkan ke halaman utama
+            return redirect()->route('home');
     })->name('dashboard');
     
     // Rute Manajemen Produk
@@ -69,7 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/produk/{id}', [SellerProductController::class, 'update'])->name('produk.update');
     Route::delete('/produk/{id}', [SellerProductController::class, 'destroy'])->name('produk.destroy');
     
-    // Rute Halaman Pesanan
+    // Rute Halaman Pesanan Penjual
     Route::get('/pesanan', function() {
         $user = Auth::user();
         $umkm = $user->umkm;
@@ -84,6 +98,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         return view('seller.pesanan.index', compact('orders', 'umkm'));
     })->name('pesanan.index');
+
+    // Rute Halaman Pesanan Pembeli
+    Route::get('/pesanan-saya', function() {
+        $orders = Order::with(['items.product', 'items.umkm'])
+            ->where('user_id', Auth::id())
+            ->latest('checked_out_at')
+            ->get();
+
+        return view('buyer.pesanan', compact('orders'));
+    })->name('buyer.orders');
+
+    // Rute Halaman Favorit Pembeli
+    Route::get('/favorit-saya', function() {
+        return view('buyer.favorites');
+    })->name('buyer.favorites');
 
     // Rute Halaman Keuangan
     Route::get('/keuangan', [SellerProductController::class, 'keuangan'])->name('keuangan.index');
@@ -115,6 +144,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pesanan-saya', [BuyerOrderController::class, 'index'])->name('buyer.orders');
 });
 
 require __DIR__.'/auth.php';

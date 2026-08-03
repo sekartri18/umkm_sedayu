@@ -15,11 +15,12 @@ class Umkm extends Model
         'user_id',
         'category_id',
         'name',
+        'owner_name',    // <-- Baris ini yang ditambahkan agar data bisa masuk
         'whatsapp_number',
         'address',
-        'maps_link', // Link Google Maps
+        'maps_link',     // Link Google Maps
         'image',
-        'status',    // Kolom verifikasi Admin (pending, approved, suspended)
+        'status',        // Kolom verifikasi Admin (pending, approved, suspended)
     ];
 
     // Definisi relasi: Sebuah UMKM dimiliki oleh 1 Kategori (BelongsTo)

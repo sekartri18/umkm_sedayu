@@ -26,6 +26,31 @@ class HomeController extends Controller
         return view('welcome', compact('categories', 'umkms', 'banners'));
     }
 
+    public function umkmList(Request $request)
+    {
+        $categories = \App\Models\Category::all();
+        
+        // Mulai query untuk mengambil UMKM yang sudah disetujui
+        $query = \App\Models\Umkm::with('category')->where('status', 'approved');
+
+        // Jika ada inputan di kotak pencarian
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('address', 'like', '%' . $search . '%')
+                  ->orWhereHas('category', function($qCat) use ($search) {
+                      $qCat->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        // Ambil data dengan pagination (12 UMKM per halaman)
+        $umkms = $query->latest()->paginate(12);
+
+        return view('umkm.index', compact('umkms', 'categories'));
+    }
+
     // Menampilkan halaman Detail Toko UMKM
     public function show($id)
     {
@@ -40,5 +65,20 @@ class HomeController extends Controller
         $products = $umkm->products()->latest()->get();
 
         return view('umkm.detail', compact('umkm', 'products'));
+    }
+
+    public function productShow($id)
+    {
+        // Cari produk berdasarkan ID beserta data UMKM pemiliknya
+        $product = \App\Models\Product::with(['umkm', 'reviews.user'])->findOrFail($id);
+        
+        // Ambil beberapa produk lain dari toko yang sama untuk rekomendasi
+        $otherProducts = \App\Models\Product::where('umkm_id', $product->umkm_id)
+                            ->where('id', '!=', $id)
+                            ->inRandomOrder()
+                            ->take(4)
+                            ->get();
+
+        return view('product.show', compact('product', 'otherProducts'));
     }
 }

@@ -94,6 +94,7 @@
             <span class="inline-flex items-center px-2.5 py-1 bg-emerald-50 text-primary text-[11px] font-bold rounded-full flex-shrink-0">
                 {{ $umkm->products->count() }} Produk
             </span>
+
         </div>
         
         <div class="mt-4">
@@ -120,21 +121,26 @@
             <!-- Grid Produk -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 @foreach($umkm->products as $product)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="h-32 bg-gray-200">
-                            @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="p-3">
-                            <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2">{{ $product->name }}</h4>
-                            <p class="text-primary font-bold text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                            <p class="text-[11px] text-gray-500 mt-1 mb-3">Stok: {{ $product->stock }}</p>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                        <!-- Bungkus area gambar dan judul dengan link ke detail produk -->
+                        <a href="{{ route('product.show', $product->id) }}" class="block group">
+                            <div class="h-32 bg-gray-200 overflow-hidden">
+                                @if($product->image)
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-gray-300">
+                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-3 pb-1">
+                                <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2 group-hover:text-primary transition">{{ $product->name }}</h4>
+                                <p class="text-primary font-bold text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                <p class="text-[11px] text-gray-500 mt-1">Stok: {{ $product->stock }}</p>
+                            </div>
+                        </a>
 
+                        <div class="p-3 pt-2 mt-auto">
                             @if($product->stock > 0)
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf

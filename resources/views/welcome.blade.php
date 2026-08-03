@@ -103,8 +103,8 @@
                     </div>
                 </div>
 
-                <!-- Form Pencarian (Fungsional) -->
-                <form action="{{ url('/') }}" method="GET" class="relative flex-1 max-w-2xl w-full">
+                <!-- Form Pencarian (Arahkan ke Rute UMKM List) -->
+                <form action="{{ route('umkm.list') }}" method="GET" class="relative flex-1 max-w-2xl w-full">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk, kategori, atau nama UMKM..." class="w-full bg-gray-50 border border-gray-200 text-[13px] md:text-sm rounded-xl py-2.5 md:py-3 pl-10 pr-12 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition">
                     <svg class="w-4 h-4 md:w-5 md:h-5 text-gray-400 absolute left-3.5 top-3 md:top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     <button type="submit" class="absolute right-2 top-1.5 md:top-2 bg-primary hover:bg-emerald-600 text-white p-1.5 rounded-lg transition">
@@ -211,7 +211,7 @@
                             // Cek apakah ada ikon di mapping, jika tidak gunakan logo box
                             $icon = $iconMap[$catKey] ?? '📦';
                         @endphp
-                        <a href="{{ url('/?search=' . $category->name) }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
+                        <a href="{{ route('umkm.list', ['search' => $category->name]) }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
                             <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-emerald-50 flex items-center justify-center text-3xl md:text-4xl border border-emerald-100 shadow-sm group-hover:bg-primary group-hover:shadow-md transition duration-300">
                                 <span class="group-hover:scale-110 transition-transform">{{ $icon }}</span>
                             </div>
@@ -221,7 +221,7 @@
 
                     <!-- Penambahan Statis Kategori "Pertanian" Jika belum ada di Database -->
                     @if(!$categories->contains('name', 'Pertanian') && !$categories->contains('name', 'pertanian'))
-                        <a href="{{ url('/?search=Pertanian') }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
+                        <a href="{{ route('umkm.list', ['search' => 'Pertanian']) }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
                             <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-emerald-50 flex items-center justify-center text-3xl md:text-4xl border border-emerald-100 shadow-sm group-hover:bg-primary group-hover:shadow-md transition duration-300">
                                 <span class="group-hover:scale-110 transition-transform">🌾</span>
                             </div>
@@ -231,17 +231,17 @@
                 </div>
             </div>
 
-            <!-- 3. UMKM PILIHAN -->
+            <!-- 3. UMKM PILIHAN (Dibuat Grid Menurun) -->
             <div id="umkm-list" class="mb-10 md:mb-14">
                 <div class="flex justify-between items-end mb-4 md:mb-6">
                     <h3 class="font-bold text-gray-900 text-base md:text-xl">UMKM Pilihan</h3>
-                    <!-- Tombol Lihat Semua yang mengarah ke pencarian kosong (menampilkan semua UMKM) -->
-                    <a href="{{ url('/?search=') }}" class="text-[11px] md:text-sm font-bold text-primary hover:text-emerald-700 hover:underline">Lihat Semua ></a>
+                    <!-- Tombol Lihat Semua yang mengarah ke halaman pencarian UMKM -->
+                    <a href="{{ route('umkm.list') }}" class="text-[11px] md:text-sm font-bold text-primary hover:text-emerald-700 hover:underline">Lihat Semua ></a>
                 </div>
                 
-                <div class="flex md:grid md:grid-cols-4 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 snap-x hide-scroll">
-                    @forelse($umkms->take(5) as $umkm)
-                        <a href="{{ route('umkm.show', $umkm->id) }}" class="min-w-[150px] md:min-w-0 md:w-full bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden snap-start block hover:-translate-y-1 hover:shadow-md transition-all">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 pb-4">
+                    @forelse($umkms as $umkm)
+                        <a href="{{ route('umkm.show', $umkm->id) }}" class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden block hover:-translate-y-1 hover:shadow-md transition-all">
                             <div class="h-32 md:h-40 bg-gray-100 relative">
                                 @if($umkm->image)
                                     <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
@@ -256,7 +256,10 @@
                                 </span>
                                 <div class="flex items-center gap-1 text-[10px] md:text-xs font-medium text-gray-500 truncate">
                                     <svg class="w-3 h-3 md:w-4 md:h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    <span class="text-gray-700 font-semibold">4.8</span>
+                                    @php
+                                        $avgRating = \App\Models\Review::whereIn('product_id', $umkm->products->pluck('id'))->avg('rating');
+                                    @endphp
+                                    <span class="text-gray-700 font-semibold">{{ $avgRating > 0 ? number_format($avgRating, 1) : '0.0' }}</span>
                                     <span class="mx-0.5 md:mx-1">•</span>
                                     <span class="truncate">{{ Str::limit(str_replace(['Jalan ', 'Desa '], '', $umkm->address), 15) }}</span>
                                 </div>
@@ -267,55 +270,6 @@
                             Pencarian tidak menemukan UMKM yang sesuai.
                         </div>
                     @endforelse
-                </div>
-            </div>
-
-            <!-- 4. BANNER PENDAFTARAN UMKM -->
-            <div class="mb-10 md:mb-14">
-                <a href="{{ route('penjual.register') }}" class="bg-primary rounded-2xl md:rounded-3xl p-5 md:p-8 flex justify-between items-center text-white relative overflow-hidden shadow-sm hover:shadow-md transition-shadow block">
-                    <div class="absolute right-0 top-0 w-32 h-32 md:w-64 md:h-64 bg-white opacity-10 rounded-full -mr-10 -mt-10 md:-mr-20 md:-mt-20"></div>
-                    <div class="relative z-10 w-3/4 md:w-1/2">
-                        <h3 class="font-bold text-[15px] md:text-2xl mb-1 md:mb-2">Punya Usaha di Sedayu?</h3>
-                        <p class="text-[11px] md:text-sm font-medium opacity-90 leading-snug">Daftarkan UMKM Anda sekarang, raih pelanggan lebih luas dan tingkatkan penjualan secara digital.</p>
-                    </div>
-                    <div class="relative z-10 w-12 h-12 md:w-16 md:h-16 bg-emerald-400 rounded-xl md:rounded-2xl flex items-center justify-center shrink-0">
-                        <svg class="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 5. UMKM TERDEKAT -->
-            <div class="mb-4">
-                <div class="flex justify-between items-end mb-4 md:mb-6">
-                    <h3 class="font-bold text-gray-900 text-base md:text-xl">UMKM Terdekat</h3>
-                    <a href="{{ url('/?search=') }}" class="text-[11px] md:text-sm font-bold text-primary hover:text-emerald-700 hover:underline">Lihat Semua ></a>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach($umkms->skip(5)->take(6) as $umkm)
-                        <a href="{{ route('umkm.show', $umkm->id) }}" class="flex items-center gap-4 bg-white p-3 md:p-4 rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm hover:border-emerald-200 hover:shadow-md transition duration-300">
-                            <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-100 rounded-xl md:rounded-2xl overflow-hidden shrink-0">
-                                @if($umkm->image)
-                                    <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80" class="w-full h-full object-cover opacity-50">
-                                @endif
-                            </div>
-                            
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-bold text-[13px] md:text-base text-gray-900 line-clamp-1 mb-0.5 md:mb-1">{{ $umkm->name }}</h4>
-                                <span class="inline-block bg-gray-50 text-gray-600 text-[9px] md:text-[10px] font-extrabold px-1.5 py-0.5 md:px-2 md:py-1 rounded md:rounded-md mb-1.5 md:mb-2 uppercase tracking-wide">
-                                    {{ $umkm->category->name ?? 'Lainnya' }}
-                                </span>
-                                <div class="flex items-center gap-1 text-[10px] md:text-xs font-medium text-gray-500">
-                                    <svg class="w-3 h-3 md:w-4 md:h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                    <span class="text-gray-700 font-semibold">4.9</span>
-                                    <span class="mx-0.5 md:mx-1">•</span>
-                                    <span class="truncate">0.3 km - {{ Str::limit(str_replace(['Desa '], '', $umkm->address), 12) }}</span>
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
                 </div>
             </div>
         </div>

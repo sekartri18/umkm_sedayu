@@ -1,112 +1,116 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin - UMKM Sedayu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jelajahi UMKM Sedayu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
-                extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { primary: '#10B981', dark: '#1F2937' } }
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: { primary: '#10B981', dark: '#1F2937' },
+                }
             }
         }
     </script>
-    <!-- CSS khusus untuk optimasi cetak kertas -->
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { background-color: white !important; }
-            .print-table-container { box-shadow: none !important; border: none !important; padding: 0 !important; }
-            table { width: 100% !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; padding: 12px 8px !important; color: #000 !important; }
-            /* Memberikan ruang yang pas agar tabel nyaman dibaca secara fisik */
-            tr { page-break-inside: avoid; }
-        }
-    </style>
+    <style>body { background-color: #f3f4f6; }</style>
 </head>
-<body class="bg-gray-100 text-dark font-sans antialiased">
+<body class="text-dark font-sans antialiased">
+    @php
+        $cartItemCount = collect(session('cart', []))->sum('quantity');
+    @endphp
 
-    <div class="min-h-screen flex">
-        <!-- Sidebar Navigation (Sembunyi saat dicetak) -->
-        <aside class="w-64 bg-dark text-white flex flex-col no-print hidden md:flex">
-            <div class="p-6 border-b border-gray-700">
-                <h1 class="text-xl font-bold text-primary">Admin Sedayu</h1>
-            </div>
-            <nav class="flex-1 p-4">
-                <a href="{{ route('admin.umkm.index') }}" class="block px-4 py-2.5 bg-gray-800 rounded-lg text-white font-medium mb-2">
-                    Data UMKM
+    <div class="max-w-7xl mx-auto bg-white min-h-screen relative shadow-sm pb-10">
+        
+        <!-- HEADER PENCARIAN -->
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 px-5 pt-4 pb-3 md:py-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
+                    <span class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm">
+                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
+                    </span>
+                    <h1 class="text-base md:text-xl font-extrabold text-primary leading-tight">UMKM Sedayu</h1>
                 </a>
-                <a href="{{ url('/') }}" class="block px-4 py-2.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition">
-                    Lihat Website
-                </a>
-            </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6 md:p-8">
-            <div class="flex justify-between items-center mb-6 no-print">
-                <h2 class="text-2xl font-bold text-gray-800">Kelola Data UMKM</h2>
-                <div class="flex gap-3">
-                    <button onclick="window.print()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Cetak Data
+                <!-- Form Pencarian Langsung Aktif -->
+                <form action="{{ route('umkm.list') }}" method="GET" class="relative flex-1 max-w-2xl w-full">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari UMKM atau kategori..." class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl py-3 pl-10 pr-12 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 transition">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <button type="submit" class="absolute right-2 top-2 bg-primary hover:bg-emerald-600 text-white p-1.5 rounded-lg transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                     </button>
-                    <a href="#" class="bg-primary hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Tambah UMKM
+                </form>
+
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="{{ route('cart.index') }}" class="relative flex items-center gap-2 text-gray-600 hover:text-primary transition font-medium">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Keranjang
+                        @if($cartItemCount > 0)
+                            <span class="absolute -top-1.5 -left-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">{{ $cartItemCount }}</span>
+                        @endif
+                    </a>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 bg-gray-50 border border-gray-200 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-100 transition">
+                        <span class="text-sm font-semibold">{{ auth()->check() ? auth()->user()->name : 'Masuk / Daftar' }}</span>
                     </a>
                 </div>
             </div>
+        </header>
 
-            <!-- Tabel Data -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden print-table-container">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200">
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600 w-12 text-center">No</th>
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600">Nama Usaha</th>
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600">Pemilik</th>
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600">Kategori</th>
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600">No. WhatsApp</th>
-                                <th class="py-4 px-6 text-sm font-semibold text-gray-600 text-right no-print">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($umkms as $index => $umkm)
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="py-4 px-6 text-sm text-gray-700 text-center">{{ $index + 1 }}</td>
-                                <td class="py-4 px-6 text-sm font-semibold text-gray-900">{{ $umkm->name }}</td>
-                                <td class="py-4 px-6 text-sm text-gray-700">{{ $umkm->owner_name }}</td>
-                                <td class="py-4 px-6 text-sm text-gray-700">
-                                    <span class="bg-green-100 text-primary px-2.5 py-1 rounded-md text-xs font-medium">
-                                        {{ $umkm->category->name }}
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-sm text-gray-700 font-medium">
-                                    +{{ $umkm->whatsapp_number }}
-                                </td>
-                                <td class="py-4 px-6 text-sm text-right no-print">
-                                    <div class="flex justify-end gap-2">
-                                        <a href="#" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded-md transition">Edit</a>
-                                        <a href="#" class="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded-md transition">Hapus</a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                            
-                            @if($umkms->isEmpty())
-                            <tr>
-                                <td colspan="6" class="py-8 text-center text-gray-500">Belum ada data UMKM.</td>
-                            </tr>
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+        <!-- KONTEN UTAMA: DAFTAR UMKM -->
+        <div class="px-5 md:px-8 max-w-5xl mx-auto py-8">
+            <div class="mb-8">
+                <a href="{{ url('/') }}" class="text-sm text-gray-500 hover:text-primary mb-2 inline-block">&larr; Kembali ke Beranda</a>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+                    {{ request('search') ? 'Hasil Pencarian' : 'Semua UMKM Sedayu' }}
+                </h2>
+                @if(request('search'))
+                    <p class="text-gray-500 mt-2">Menampilkan hasil untuk: <span class="font-bold text-primary">"{{ request('search') }}"</span></p>
+                @endif
             </div>
-        </main>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                @forelse($umkms as $umkm)
+                    <a href="{{ route('umkm.show', $umkm->id) }}" class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden block hover:-translate-y-1 hover:shadow-md transition-all">
+                        <div class="h-32 md:h-48 bg-gray-100 relative">
+                            @if($umkm->image)
+                                <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
+                            @else
+                                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover opacity-50">
+                            @endif
+                        </div>
+                        <div class="p-4 md:p-5">
+                            <h4 class="font-bold text-sm md:text-lg text-gray-900 line-clamp-1 mb-1">{{ $umkm->name }}</h4>
+                            <span class="inline-block bg-emerald-50 text-primary text-[10px] md:text-xs font-bold px-2 py-1 rounded uppercase tracking-wider mb-2">
+                                {{ $umkm->category->name ?? 'Lainnya' }}
+                            </span>
+                            <div class="flex items-center gap-1 text-[10px] md:text-sm font-medium text-gray-500">
+                                <svg class="w-4 h-4 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <span class="text-gray-700 font-semibold">4.8</span>
+                                <span class="mx-1">•</span>
+                                <span class="truncate">{{ Str::limit(str_replace(['Jalan ', 'Desa '], '', $umkm->address), 15) }}</span>
+                            </div>
+                        </div>
+                    </a>
+                @empty
+                    <div class="col-span-full py-16 text-center">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">UMKM Tidak Ditemukan</h3>
+                        <p class="text-gray-500 text-sm">Coba gunakan kata kunci pencarian yang berbeda.</p>
+                        <a href="{{ route('umkm.list') }}" class="inline-block mt-4 text-primary font-semibold hover:underline">Lihat Semua UMKM</a>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Menampilkan Pagination (Halaman 1, 2, 3...) -->
+            <div class="mt-10">
+                {{ $umkms->appends(request()->query())->links() }}
+            </div>
+        </div>
     </div>
 </body>
 </html>

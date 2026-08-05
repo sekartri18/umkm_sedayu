@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <title>{{ $product->name }} - UMKM Sedayu</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -143,6 +143,11 @@
                             </div>
                         </div>
                         <p class="text-gray-600 text-sm ml-13 pl-13">{{ $review->comment }}</p>
+                        @if($review->review_photo)
+                            <div class="mt-3 ml-13 pl-13">
+                                <img src="{{ asset('storage/' . $review->review_photo) }}" alt="Foto Ulasan dari {{ $review->user->name }}" class="w-full max-w-xs rounded-2xl shadow-sm border border-gray-200 object-cover">
+                            </div>
+                        @endif
                     </div>
                 @empty
                     <p class="text-center text-gray-500 py-4 text-sm">Belum ada ulasan untuk produk ini.</p>

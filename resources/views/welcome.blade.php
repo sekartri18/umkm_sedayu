@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <title>UMKM Sedayu - Direktori Produk Lokal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,11 +57,11 @@
                 
                 <div class="flex items-center justify-between">
                     <!-- Logo & Judul -->
-                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2">
-                        <span class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary text-white flex items-center justify-center shadow-soft">
-                            <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
+                    <a href="{{ url('/') }}" class="inline-flex items-end gap-2">
+                        <span class="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary overflow-hidden shadow-soft flex items-center justify-center">
+                            <img src="{{ asset('logo.svg') }}" alt="UMKM Sedayu" class="w-full h-full object-cover" />
                         </span>
-                        <div>
+                        <div class="pb-1">
                             <h1 class="text-base md:text-xl font-extrabold text-primary leading-tight">UMKM Sedayu</h1>
                         </div>
                     </a>

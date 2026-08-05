@@ -13,8 +13,8 @@
     <!-- 1. MOBILE TOPBAR (Hanya tampil di layar kecil / HP) -->
     <div class="lg:hidden bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center z-20 relative shadow-sm no-print">
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
+            <div class="w-8 h-8 rounded-lg bg-emerald-500 overflow-hidden shadow-sm">
+                <img src="{{ asset('logo.svg') }}" alt="UMKM Sedayu" class="w-full h-full object-cover" />
             </div>
             <span class="font-extrabold text-emerald-600">UMKM Sedayu</span>
         </a>
@@ -38,8 +38,8 @@
             <!-- Logo Sidebar (PC / Desktop) -->
             <div class="hidden lg:flex items-center justify-center h-16 border-b border-gray-100 px-6 bg-white shrink-0">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2 hover:scale-105 transition-transform">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7l9-4 9 4M4 10h16v10a1 1 0 01-1 1H5a1 1 0 01-1-1V10z"></path></svg>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500 overflow-hidden shadow-sm">
+                        <img src="{{ asset('logo.svg') }}" alt="UMKM Sedayu" class="w-full h-full object-cover" />
                     </div>
                     <span class="text-lg font-extrabold text-emerald-600 tracking-tight">UMKM Sedayu</span>
                 </a>

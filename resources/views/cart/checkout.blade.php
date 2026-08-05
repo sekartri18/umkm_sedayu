@@ -19,7 +19,7 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased pb-10">
     <div class="max-w-5xl mx-auto px-4 py-6">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
         <div class="flex items-center gap-3 mb-6">
             <a href="{{ route('cart.index') }}" class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-primary transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>

@@ -148,7 +148,7 @@
                      x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
                      class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
                     
-                    <form :action="'/produk-detail/' + productId + '/ulasan'" method="POST">
+                    <form :action="'/produk-detail/' + productId + '/ulasan'" method="POST" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="order_id" :value="orderId">
                         
@@ -175,6 +175,11 @@
                                     <div class="mb-2 text-left">
                                         <label class="block text-sm font-bold text-gray-700 mb-2">Tuliskan Pengalaman Anda <span class="text-red-500">*</span></label>
                                         <textarea name="comment" rows="4" required placeholder="Bagaimana kualitas produk ini menurut Anda? Tuliskan di sini..." class="w-full border-gray-200 bg-gray-50 rounded-xl shadow-sm focus:ring-emerald-500 focus:border-emerald-500 text-sm py-3 px-4"></textarea>
+                                    </div>
+                                    <div class="mb-4 text-left">
+                                        <label for="review_photo" class="block text-sm font-bold text-gray-700 mb-2">Foto Ulasan (opsional)</label>
+                                        <input id="review_photo" type="file" name="review_photo" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+                                        <p class="text-xs text-gray-500 mt-1">Unggah foto produk untuk mendukung ulasan Anda. Maksimal 4MB.</p>
                                     </div>
                                 </div>
                             </div>

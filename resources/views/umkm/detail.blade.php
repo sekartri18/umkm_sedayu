@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <title>{{ $umkm->name }} - UMKM Sedayu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -120,12 +120,12 @@
             </div>
         @else
             <!-- Grid Produk -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 @foreach($umkm->products as $product)
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                         <!-- Bungkus area gambar dan judul dengan link ke detail produk -->
                         <a href="{{ route('product.show', $product->id) }}" class="block group">
-                            <div class="h-44 sm:h-48 lg:h-56 bg-gray-200 overflow-hidden">
+                            <div class="h-36 sm:h-40 lg:h-48 bg-gray-200 overflow-hidden">
                                 @if($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                 @else

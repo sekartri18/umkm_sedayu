@@ -15,7 +15,7 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased overflow-hidden">
 
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('logo.svg') }}" type="image/svg+xml">
     <div class="flex h-screen w-full">
         <!-- Sidebar (Kiri) -->
         <aside class="w-64 bg-white border-r border-gray-100 flex flex-col hidden md:flex shrink-0 shadow-sm z-10">

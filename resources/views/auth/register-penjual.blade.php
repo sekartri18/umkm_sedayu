@@ -20,6 +20,7 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased min-h-screen flex flex-col justify-center py-10 sm:px-6 lg:px-8">
 
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <div class="sm:mx-auto sm:w-full sm:max-w-md px-4">
         <a href="{{ url('/') }}" class="flex justify-center mb-6">
             <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white shadow-md">

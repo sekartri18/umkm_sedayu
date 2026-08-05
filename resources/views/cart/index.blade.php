@@ -19,6 +19,7 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased pb-10">
     <div class="max-w-5xl mx-auto px-4 py-6">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
                 <a href="{{ url('/') }}" class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-primary transition">

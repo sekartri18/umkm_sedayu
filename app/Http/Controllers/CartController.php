@@ -156,34 +156,59 @@ class CartController extends Controller
 
         $orderCode = 'ORD-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4));
 
-        $order = DB::transaction(function () use ($request, $cart, $summary, $orderCode) {
-            $order = Order::create([
-                'user_id' => auth()->id(),
-                'order_code' => $orderCode,
-                'customer_name' => $request->customer_name,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'payment_method' => $request->payment_method,
-                'notes' => $request->notes,
-                'total_items' => $summary['totalItems'],
-                'subtotal' => $summary['subtotal'],
-                'status' => 'baru',
-                'checked_out_at' => now(),
-            ]);
+        try {
+            $order = DB::transaction(function () use ($request, $cart, $summary, $orderCode) {
+                $productIds = array_keys($cart);
+                $products = Product::whereIn('id', $productIds)
+                    ->lockForUpdate()
+                    ->get()
+                    ->keyBy('id');
 
-            foreach ($cart as $item) {
-                $order->items()->create([
-                    'product_id' => $item['product_id'],
-                    'umkm_id' => $item['umkm_id'],
-                    'product_name' => $item['name'],
-                    'price' => (int) $item['price'],
-                    'quantity' => (int) $item['quantity'],
-                    'subtotal' => (int) $item['price'] * (int) $item['quantity'],
+                foreach ($cart as $productId => $item) {
+                    if (!isset($products[$productId])) {
+                        throw new \RuntimeException('Salah satu produk di keranjang sudah tidak tersedia.');
+                    }
+
+                    $product = $products[$productId];
+                    $quantity = (int) $item['quantity'];
+
+                    if ($product->stock < $quantity) {
+                        throw new \RuntimeException('Stok produk "' . $product->name . '" tidak mencukupi.');
+                    }
+
+                    $product->decrement('stock', $quantity);
+                }
+
+                $order = Order::create([
+                    'user_id' => auth()->id(),
+                    'order_code' => $orderCode,
+                    'customer_name' => $request->customer_name,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'payment_method' => $request->payment_method,
+                    'notes' => $request->notes,
+                    'total_items' => $summary['totalItems'],
+                    'subtotal' => $summary['subtotal'],
+                    'status' => 'baru',
+                    'checked_out_at' => now(),
                 ]);
-            }
 
-            return $order;
-        });
+                foreach ($cart as $item) {
+                    $order->items()->create([
+                        'product_id' => $item['product_id'],
+                        'umkm_id' => $item['umkm_id'],
+                        'product_name' => $item['name'],
+                        'price' => (int) $item['price'],
+                        'quantity' => (int) $item['quantity'],
+                        'subtotal' => (int) $item['price'] * (int) $item['quantity'],
+                    ]);
+                }
+
+                return $order;
+            });
+        } catch (\Throwable $e) {
+            return redirect()->route('cart.index')->with('error', $e->getMessage());
+        }
 
         // Menyimpan data checkout terakhir ke session (Untuk halaman sukses)
         session()->put(self::LAST_CHECKOUT_KEY, [

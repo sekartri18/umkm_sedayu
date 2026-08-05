@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <title>{{ config('app.name', 'UMKM Sedayu') }} - Akun Pembeli</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -38,9 +39,6 @@
                         </a>
                         <a href="{{ route('buyer.favorites') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl {{ request()->routeIs('buyer.favorites') ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} transition">
                             Barang Favorit
-                        </a>
-                        <a href="#" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition">
-                            Chat Toko
                         </a>
                         <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition mt-4 pt-4 border-t border-gray-100">
                             Pengaturan Profil

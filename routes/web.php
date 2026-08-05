@@ -17,6 +17,7 @@ use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminBannerController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\BuyerOrderController;
+use App\Http\Controllers\BuyerFavoriteController;
 use App\Http\Controllers\ReviewController;
 
 /*
@@ -111,9 +112,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rute untuk tombol "Pesanan Diterima" dan pelepasan dana
     Route::patch('/pesanan-saya/{id}/selesai', [BuyerOrderController::class, 'completeOrder'])->name('buyer.orders.complete');
 
-    Route::get('/favorit-saya', function() {
-        return view('buyer.favorites');
-    })->name('buyer.favorites');
+    Route::get('/favorit-saya', [BuyerFavoriteController::class, 'index'])->name('buyer.favorites');
+    Route::post('/favorit-saya/{product}', [BuyerFavoriteController::class, 'toggle'])->name('buyer.favorites.toggle');
+    Route::delete('/favorit-saya/{product}', [BuyerFavoriteController::class, 'destroy'])->name('buyer.favorites.destroy');
 
     // Rute Tambah Ulasan Produk (Pembeli)
     Route::post('/produk-detail/{id}/ulasan', [ReviewController::class, 'store'])->name('reviews.store');

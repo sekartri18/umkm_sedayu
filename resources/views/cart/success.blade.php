@@ -19,6 +19,7 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased">
     <div class="min-h-screen flex items-center justify-center px-4 py-8">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
         <div class="max-w-2xl w-full bg-white rounded-3xl border border-gray-100 shadow-sm p-6 sm:p-8">
             <div class="w-14 h-14 rounded-full bg-emerald-100 text-primary flex items-center justify-center mx-auto mb-4">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>

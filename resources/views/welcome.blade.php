@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <title>UMKM Sedayu - Direktori Produk Lokal</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,6 +35,7 @@
 <body class="text-dark font-sans antialiased">
     @php
         $cartItemCount = collect(session('cart', []))->sum('quantity');
+        $isSeller = auth()->check() && in_array(auth()->user()->role, ['seller', 'penjual'], true);
         
         // Memetakan Ikon untuk kategori
         $iconMap = [
@@ -84,8 +86,10 @@
                                         <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
                                     </div>
                                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Profil</a>
-                                    <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
-                                    <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
+                                        @unless($isSeller)
+                                            <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
+                                            <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
+                                        @endunless
                                     @if(auth()->user()->umkm)
                                         <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
                                     @endif
@@ -134,8 +138,10 @@
                                     <p class="text-xs font-bold text-gray-900 truncate">{{ auth()->user()->name }}</p>
                                 </div>
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Profil</a>
-                                <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
-                                <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
+                                @unless($isSeller)
+                                    <a href="{{ route('buyer.orders') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Pesanan Saya</a>
+                                    <a href="{{ route('buyer.favorites') }}" class="block px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-emerald-50 transition">Barang Favorit</a>
+                                @endunless
                                 @if(auth()->user()->umkm)
                                     <a href="{{ route('dashboard') }}" class="block px-4 py-2.5 text-xs font-semibold text-primary hover:bg-emerald-50 transition">Dashboard Toko</a>
                                 @endif

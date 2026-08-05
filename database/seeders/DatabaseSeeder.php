@@ -15,12 +15,17 @@ class DatabaseSeeder extends Seeder
     {
         // Pengecekan aman: hanya buat user jika email belum ada
         User::firstOrCreate(
-            ['email' => 'test@example.com'],
+            ['email' => 'admin@gmail.com'],
             [
-                'name' => 'Test User',
-                'password' => Hash::make('password123'),
+                'name' => 'Admin',
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
             ]
         );
+
+        $this->call([
+            AdminSeeder::class,
+        ]);
 
         // Memanggil UmkmSeeder
         $this->call([

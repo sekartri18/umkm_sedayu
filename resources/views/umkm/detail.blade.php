@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <title>{{ $umkm->name }} - UMKM Sedayu</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -119,36 +120,36 @@
             </div>
         @else
             <!-- Grid Produk -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                 @foreach($umkm->products as $product)
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                         <!-- Bungkus area gambar dan judul dengan link ke detail produk -->
                         <a href="{{ route('product.show', $product->id) }}" class="block group">
-                            <div class="h-32 bg-gray-200 overflow-hidden">
+                            <div class="h-44 sm:h-48 lg:h-56 bg-gray-200 overflow-hidden">
                                 @if($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     </div>
                                 @endif
                             </div>
-                            <div class="p-3 pb-1">
-                                <h4 class="text-xs font-semibold text-dark mb-1 line-clamp-2 group-hover:text-primary transition">{{ $product->name }}</h4>
-                                <p class="text-primary font-bold text-sm">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                                <p class="text-[11px] text-gray-500 mt-1">Stok: {{ $product->stock }}</p>
+                            <div class="p-4 pb-1">
+                                <h4 class="text-sm font-semibold text-dark mb-1 line-clamp-2 group-hover:text-primary transition">{{ $product->name }}</h4>
+                                <p class="text-primary font-bold text-base">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                <p class="text-xs text-gray-500 mt-1">Stok: {{ $product->stock }}</p>
                             </div>
                         </a>
 
-                        <div class="p-3 pt-2 mt-auto">
+                        <div class="p-4 pt-2 mt-auto">
                             @if($product->stock > 0)
                                 <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="w-full bg-primary hover:bg-emerald-600 text-white text-xs font-bold py-2 rounded-lg transition">+ Tambah ke Keranjang</button>
+                                    <button type="submit" class="w-full bg-primary hover:bg-emerald-600 text-white text-sm font-bold py-2.5 rounded-xl transition">+ Tambah ke Keranjang</button>
                                 </form>
                             @else
-                                <button type="button" disabled class="w-full bg-gray-100 text-gray-400 text-xs font-bold py-2 rounded-lg cursor-not-allowed">Stok Habis</button>
+                                <button type="button" disabled class="w-full bg-gray-100 text-gray-400 text-sm font-bold py-2.5 rounded-xl cursor-not-allowed">Stok Habis</button>
                             @endif
                         </div>
                     </div>

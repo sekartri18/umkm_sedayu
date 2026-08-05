@@ -15,12 +15,13 @@
 </head>
 <body class="bg-gray-50 text-dark font-sans antialiased overflow-hidden">
 
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <div class="flex h-screen w-full">
         <!-- Sidebar (Kiri) -->
         <aside class="w-64 bg-white border-r border-gray-100 flex flex-col hidden md:flex shrink-0 shadow-sm z-10">
             <div class="p-6 border-b border-gray-50">
                 <h1 class="text-xl font-bold text-primary flex items-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     Seller Center
                 </h1>
             </div>

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <title>{{ $product->name }} - UMKM Sedayu</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,6 +22,7 @@
 <body class="text-dark font-sans antialiased pb-24 md:pb-10">
     @php
         $cartItemCount = collect(session('cart', []))->sum('quantity');
+        $isFavorited = auth()->check() && auth()->user()->favoriteProducts()->whereKey($product->id)->exists();
     @endphp
 
     <!-- HEADER -->
@@ -83,20 +85,33 @@
 
                 <!-- Aksi Beli -->
                 <div class="mt-8 pt-6 border-t border-gray-100">
-                    @if($product->stock > 0)
-                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex gap-3">
-                            @csrf
-                            <button type="submit" class="flex-1 bg-white border-2 border-primary text-primary hover:bg-emerald-50 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                Masukkan Keranjang
+                    <div class="flex gap-3">
+                        @if($product->stock > 0)
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
+                                @csrf
+                                <button type="submit" class="w-full bg-white border-2 border-primary text-primary hover:bg-emerald-50 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    Masukkan Keranjang
+                                </button>
+                            </form>
+                        @else
+                            <button disabled class="w-full bg-gray-200 text-gray-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                Maaf, Stok Sedang Habis
                             </button>
-                        </form>
-                    @else
-                        <button disabled class="w-full bg-gray-200 text-gray-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                            Maaf, Stok Sedang Habis
-                        </button>
-                    @endif
+                        @endif
+
+                        @auth
+                            <form action="{{ route('buyer.favorites.toggle', $product->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" aria-label="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" title="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" class="h-full rounded-xl border px-3 py-3.5 transition {{ $isFavorited ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50' }}">
+                                    <svg class="w-5 h-5" fill="{{ $isFavorited ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        @endauth
+                    </div>
                 </div>
             </div>
         </div>

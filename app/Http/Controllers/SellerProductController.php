@@ -205,6 +205,7 @@ class SellerProductController extends Controller
     }
 
     // 8. Halaman Keuangan (Menghitung Saldo dan Riwayat)
+    // 8. Halaman Keuangan (Menghitung Saldo dan Riwayat)
     public function keuangan()
     {
         $user = Auth::user();
@@ -212,52 +213,59 @@ class SellerProductController extends Controller
 
         if (!$umkm) { return redirect('/'); }
 
-        // Tarik semua pesanan (order_items) milik UMKM ini
-        $orderItems = OrderItem::with(['order', 'product'])
-            ->whereHas('product', function($q) use ($umkm) {
-                $q->where('umkm_id', $umkm->id);
-            })
-            ->latest()
-            ->get();
+        // Saldo Aktif mengambil langsung dari database dompet UMKM
+        $saldoAktif = $umkm->balance ?? 0;
 
-        $saldoAktif = 0;
-        $saldoTertunda = 0;
-        $riwayatTransaksi = [];
+        // Saldo Tertunda (Pesanan yang belum 'Selesai' atau 'Batal' DAN BUKAN COD)
+        $saldoTertunda = \App\Models\OrderItem::where('umkm_id', $umkm->id)
+            ->whereHas('order', function($q) {
+                $q->whereNotIn('status', ['Selesai', 'Batal', 'Dibatalkan'])
+                  ->whereRaw('LOWER(payment_method) != ?', ['cod']);
+            })->sum('subtotal');
 
-        foreach ($orderItems as $item) {
-            if (!$item->order) continue;
+        // Total Penghasilan Sistem (Semua uang masuk dari transaksi dompet berstatus success)
+        $totalPenghasilan = $umkm->walletTransactions()->where('type', 'income')->where('status', 'success')->sum('amount');
 
-            // Hitung harga per item (prioritas dari order_item, jika kosong ambil dari master produk)
-            $harga = $item->price ?? $item->product->price ?? 0;
-            $totalSatuItem = $harga * $item->quantity;
-            $statusPesanan = strtolower($item->order->status);
+        // Riwayat Mutasi Dompet
+        $riwayatTransaksi = $umkm->walletTransactions()->latest()->get();
 
-            // Klasifikasi Saldo
-            if ($statusPesanan === 'selesai') {
-                $saldoAktif += $totalSatuItem;
-            } else {
-                $saldoTertunda += $totalSatuItem;
-            }
-
-            // Masukkan ke array Riwayat Transaksi
-            $riwayatTransaksi[] = [
-                'tanggal' => $item->created_at,
-                'id_referensi' => $item->order->order_code,
-                'keterangan' => 'Penjualan produk ' . $item->product->name . ' (' . $item->quantity . ' Pcs)',
-                'nominal' => $totalSatuItem,
-                'status' => $statusPesanan,
-            ];
-        }
-
-        // Total Penghasilan adalah seluruh pesanan yang sudah selesai (Saldo Aktif)
-        $totalPenghasilan = $saldoAktif;
-
-        // Ubah array ke Collection agar mudah di-sorting dan di-loop di blade
-        $riwayatTransaksi = collect($riwayatTransaksi)->sortByDesc('tanggal');
-
-        return view('seller.keuangan.index', compact('saldoAktif', 'saldoTertunda', 'totalPenghasilan', 'riwayatTransaksi'));
+        return view('seller.keuangan.index', compact('saldoAktif', 'saldoTertunda', 'totalPenghasilan', 'riwayatTransaksi', 'umkm'));
     }
 
+    // Fungsi Baru: Memproses Permintaan Tarik Saldo
+    public function tarikSaldo(Request $request)
+    {
+        $user = Auth::user();
+        $umkm = $user->umkm;
+
+        $request->validate([
+            'amount' => 'required|numeric|min:10000', // Minimal penarikan Rp 10.000
+        ]);
+
+        // Cek apakah UMKM sudah mengisi data bank
+        if (!$umkm->bank_name || !$umkm->bank_account) {
+            return back()->with('error', 'Silakan lengkapi data Rekening Bank di menu Pengaturan Toko terlebih dahulu sebelum menarik dana.');
+        }
+
+        // Cek apakah saldo cukup
+        if ($request->amount > $umkm->balance) {
+            return back()->with('error', 'Saldo tidak mencukupi untuk melakukan penarikan ini.');
+        }
+
+        // 1. Kurangi saldo aktif UMKM
+        $umkm->decrement('balance', $request->amount);
+
+        // 2. Buat riwayat transaksi penarikan (berstatus pending menunggu transfer Admin)
+        \App\Models\WalletTransaction::create([
+            'umkm_id' => $umkm->id,
+            'type' => 'withdrawal',
+            'amount' => $request->amount,
+            'status' => 'pending',
+            'description' => 'Penarikan saldo ke ' . $umkm->bank_name . ' (' . $umkm->bank_account . ' - ' . $umkm->bank_owner . ')',
+        ]);
+
+        return back()->with('success', 'Permintaan penarikan dana berhasil diajukan! Admin akan segera memproses transfer ke rekening Anda.');
+    }
     // 9. Menampilkan Halaman Pengaturan Toko
     public function pengaturan()
     {
@@ -269,8 +277,7 @@ class SellerProductController extends Controller
         return view('seller.pengaturan.index', compact('umkm'));
     }
 
-    // 10. Memproses Pembaruan Profil Toko
-    // 10. Memproses Pembaruan Profil Toko & Keamanan
+    // 10. Memproses Pembaruan Profil Toko & Keamanan & Rekening Bank
     public function updatePengaturan(Request $request)
     {
         $user = Auth::user();
@@ -283,7 +290,13 @@ class SellerProductController extends Controller
             'name' => 'required|string|max:255',
             'whatsapp_number' => 'nullable|string|max:20',
             'address' => 'nullable|string',
-            'maps_link' => 'nullable|url', // Validasi harus berupa link URL
+            'maps_link' => 'nullable|url',
+            
+            // Validasi Rekening Bank
+            'bank_name' => 'nullable|string|max:100',
+            'bank_account' => 'nullable|string|max:50',
+            'bank_owner' => 'nullable|string|max:255',
+            
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             
             // Validasi kata sandi (Hanya wajib jika kolom password baru diisi)
@@ -298,12 +311,17 @@ class SellerProductController extends Controller
             ]);
         }
 
-        // 2. Proses Update Profil Toko
+        // 2. Proses Update Profil Toko & Data Bank
         $data = [
             'name' => $request->name,
             'whatsapp_number' => $request->whatsapp_number,
             'address' => $request->address,
             'maps_link' => $request->maps_link,
+            
+            // Data Rekening Bank
+            'bank_name' => $request->bank_name,
+            'bank_account' => $request->bank_account,
+            'bank_owner' => $request->bank_owner,
         ];
 
         // Jika penjual mengunggah foto profil toko baru
@@ -316,6 +334,20 @@ class SellerProductController extends Controller
 
         $umkm->update($data);
 
-        return redirect()->route('pengaturan.index')->with('success', 'Profil toko dan pengaturan keamanan berhasil diperbarui!');
+        return redirect()->route('pengaturan.index')->with('success', 'Profil toko, rekening bank, dan pengaturan keamanan berhasil diperbarui!');
+    }
+
+    // 11. Logika untuk mengubah status pesanan menjadi Dikirim
+    public function kirimPesanan($id)
+    {
+        $order = \App\Models\Order::findOrFail($id);
+        
+        // Memastikan hanya pesanan berstatus 'Baru' yang bisa diproses
+        if (strtolower($order->status) === 'baru' || strtolower($order->status) === 'dibayar') {
+            $order->update(['status' => 'Dikirim']);
+            return back()->with('success', 'Pesanan berhasil diproses! Status telah diubah menjadi "Dikirim".');
+        }
+
+        return back()->with('error', 'Status pesanan tidak dapat diubah.');
     }
 }

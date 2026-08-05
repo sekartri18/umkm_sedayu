@@ -36,7 +36,7 @@
                                 $sellerSubtotal = $sellerItems->sum('subtotal');
                             @endphp
                             <tr class="border-b border-gray-100 hover:bg-gray-50/70">
-                                <td class="py-4 px-4 text-sm font-semibold text-gray-900">{{ $order->order_code }}</td>
+                                <td class="py-4 px-4 text-sm font-semibold text-gray-900">{{ $order->order_code ?? $order->id }}</td>
                                 <td class="py-4 px-4 text-sm text-gray-700">{{ $order->customer_name }}</td>
                                 <td class="py-4 px-4 text-sm text-gray-700">{{ $productNames }}</td>
                                 <td class="py-4 px-4 text-sm font-semibold text-gray-900">Rp {{ number_format($sellerSubtotal, 0, ',', '.') }}</td>
@@ -44,7 +44,17 @@
                                     <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-primary">{{ ucfirst($order->status) }}</span>
                                 </td>
                                 <td class="py-4 px-4 text-sm text-right">
-                                    <span class="text-xs text-gray-500">{{ optional($order->checked_out_at)->format('d M Y, H:i') }}</span>
+                                    @if(strtolower($order->status) === 'baru' || strtolower($order->status) === 'dibayar')
+                                        <form action="{{ route('seller.pesanan.kirim', $order->id) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" onclick="return confirm('Apakah Anda yakin pesanan ini sudah diproses dan diserahkan ke kurir?')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-sm transition text-xs">
+                                                Kirim Barang
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-xs text-gray-500">{{ optional($order->checked_out_at)->format('d M Y, H:i') ?? $order->created_at->format('d M Y, H:i') }}</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

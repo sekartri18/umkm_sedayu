@@ -102,8 +102,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('seller.pesanan.index', compact('orders', 'umkm'));
     })->name('pesanan.index');
 
+    // BARIS BARU: Rute untuk penjual memproses dan mengirim barang
+    Route::patch('/pesanan/{id}/kirim', [SellerProductController::class, 'kirimPesanan'])->name('seller.pesanan.kirim');
+
     // Rute Halaman Pesanan & Favorit (Pembeli) terhubung ke Controller buatan temanmu
     Route::get('/pesanan-saya', [BuyerOrderController::class, 'index'])->name('buyer.orders');
+    
+    // Rute untuk tombol "Pesanan Diterima" dan pelepasan dana
+    Route::patch('/pesanan-saya/{id}/selesai', [BuyerOrderController::class, 'completeOrder'])->name('buyer.orders.complete');
+
     Route::get('/favorit-saya', function() {
         return view('buyer.favorites');
     })->name('buyer.favorites');
@@ -113,6 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Rute Halaman Keuangan (Penjual)
     Route::get('/keuangan', [SellerProductController::class, 'keuangan'])->name('keuangan.index');
+    Route::post('/keuangan/tarik', [SellerProductController::class, 'tarikSaldo'])->name('keuangan.tarik'); // BARIS BARU
 
     // Rute Halaman Pengaturan Toko (Penjual)
     Route::get('/pengaturan', [SellerProductController::class, 'pengaturan'])->name('pengaturan.index');
@@ -130,6 +138,8 @@ Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () 
     Route::resource('/category', AdminCategoryController::class)->names('admin.category');
     Route::resource('/banner', AdminBannerController::class)->names('admin.banner')->only(['index', 'store', 'destroy']);
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/penarikan', [App\Http\Controllers\AdminWithdrawalController::class, 'index'])->name('admin.withdrawals.index');
+    Route::patch('/penarikan/{id}/setujui', [App\Http\Controllers\AdminWithdrawalController::class, 'approve'])->name('admin.withdrawals.approve');
 });
 
 /*

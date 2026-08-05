@@ -13,7 +13,7 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
             <div class="p-6 sm:p-8 border-b border-gray-100">
                 <h3 class="text-lg font-bold text-gray-900">Profil & Keamanan Akun</h3>
-                <p class="text-sm text-gray-500 mt-1">Kelola informasi toko dan tingkatkan keamanan akun Seller Anda di sini.</p>
+                <p class="text-sm text-gray-500 mt-1">Kelola informasi toko, rekening pencairan, dan tingkatkan keamanan akun Seller Anda di sini.</p>
             </div>
 
             <form action="{{ route('pengaturan.update') }}" method="POST" enctype="multipart/form-data">
@@ -85,10 +85,36 @@
                     </div>
                 </div>
 
-                <!-- BAGIAN 3: KEAMANAN AKUN (GANTI KATA SANDI) -->
+                <!-- BAGIAN 3: INFORMASI REKENING BANK -->
+                <div class="p-6 sm:p-8 space-y-6 border-t border-gray-100">
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider text-emerald-600 mb-1">3. Informasi Rekening Bank</h4>
+                        <p class="text-xs text-gray-500">Rekening ini akan digunakan oleh Admin UMKM Sedayu untuk mentransfer dana penghasilan Anda secara manual.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="bank_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Bank</label>
+                            <input type="text" name="bank_name" id="bank_name" value="{{ old('bank_name', $umkm->bank_name) }}" placeholder="Contoh: BCA, BRI, Mandiri..." class="w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 outline-none transition">
+                            @error('bank_name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="bank_account" class="block text-sm font-medium text-gray-700 mb-1">Nomor Rekening</label>
+                            <input type="text" name="bank_account" id="bank_account" value="{{ old('bank_account', $umkm->bank_account) }}" placeholder="Contoh: 1234567890" class="w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 outline-none transition">
+                            @error('bank_account') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="bank_owner" class="block text-sm font-medium text-gray-700 mb-1">Nama Pemilik Rekening</label>
+                            <input type="text" name="bank_owner" id="bank_owner" value="{{ old('bank_owner', $umkm->bank_owner) }}" placeholder="Sesuai yang tertera pada buku tabungan" class="w-full md:w-1/2 rounded-lg border-gray-300 bg-gray-50 border p-2.5 text-sm focus:border-emerald-500 focus:ring-emerald-500 outline-none transition">
+                            @error('bank_owner') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BAGIAN 4: KEAMANAN AKUN (GANTI KATA SANDI) -->
                 <div class="p-6 sm:p-8 space-y-6 border-t border-gray-100 bg-gray-50/50">
                     <div>
-                        <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider text-emerald-600">3. Keamanan Akun</h4>
+                        <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider text-emerald-600">4. Keamanan Akun</h4>
                         <p class="text-xs text-gray-500 mt-1">Biarkan kosong jika Anda tidak ingin mengganti kata sandi.</p>
                     </div>
 

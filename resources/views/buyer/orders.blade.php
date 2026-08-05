@@ -72,24 +72,27 @@
                                                 <p class="font-bold text-gray-900 text-base">{{ $item->product->name ?? 'Nama Produk' }}</p>
                                                 <p class="text-sm text-gray-500 mb-3">{{ $item->quantity }} x Rp {{ number_format($item->price, 0, ',', '.') }}</p>
                                                 
-                                                @php
-                                                    // Pengecekan: Apakah produk INI pada pesanan INI sudah diulas?
-                                                    $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
-                                                        ->where('product_id', $item->product->id ?? 0)
-                                                        ->where('order_id', $order->id)
-                                                        ->exists();
-                                                @endphp
-                                                
-                                                @if(!$hasReviewed)
-                                                    <button type="button" @click="showReviewModal = true; productId = '{{ $item->product->id ?? '' }}'; productName = {{ json_encode($item->product->name ?? 'Produk') }}; orderId = '{{ $order->id }}'" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-100 hover:text-emerald-700 transition shadow-sm">
-                                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                                        Beri Ulasan
-                                                    </button>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg shadow-sm">
-                                                        <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                                        Ulasan Terkirim
-                                                    </span>
+                                                <!-- Logika Menampilkan Tombol Ulasan atau Label Ulasan Terkirim -->
+                                                @if(strtolower($order->status) === 'selesai')
+                                                    @php
+                                                        // Pengecekan: Apakah produk INI pada pesanan INI sudah diulas?
+                                                        $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
+                                                            ->where('product_id', $item->product->id ?? 0)
+                                                            ->where('order_id', $order->id)
+                                                            ->exists();
+                                                    @endphp
+                                                    
+                                                    @if(!$hasReviewed)
+                                                        <button type="button" @click="showReviewModal = true; productId = '{{ $item->product->id ?? '' }}'; productName = {{ json_encode($item->product->name ?? 'Produk') }}; orderId = '{{ $order->id }}'" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-100 hover:text-emerald-700 transition shadow-sm">
+                                                            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                                            Beri Ulasan
+                                                        </button>
+                                                    @else
+                                                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-lg shadow-sm">
+                                                            <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                                            Ulasan Terkirim
+                                                        </span>
+                                                    @endif
                                                 @endif
                                             </div>
                                             <p class="font-bold text-gray-900 mt-0.5">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</p>
@@ -97,13 +100,30 @@
                                     @endforeach
                                 </div>
                                 
-                                <div class="bg-gray-50 px-5 py-3 border-t border-gray-200 flex justify-between items-center">
+                                <!-- Footer Total Belanja & Aksi Pesanan -->
+                                <div class="bg-gray-50 px-5 py-4 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                                    
                                     <button @click="openOrder === {{ $order->id }} ? openOrder = null : openOrder = {{ $order->id }}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition flex items-center gap-1">
                                         <span x-text="openOrder === {{ $order->id }} ? 'Tutup Detail' : 'Lihat Detail'"></span>
                                     </button>
-                                    <div>
-                                        <span class="text-sm text-gray-600 mr-2">Total Belanja:</span>
-                                        <span class="text-lg font-black text-emerald-600">Rp {{ number_format($order->subtotal ?? 0, 0, ',', '.') }}</span>
+
+                                    <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                        <div>
+                                            <span class="text-sm text-gray-600 mr-2">Total Belanja:</span>
+                                            <span class="text-lg font-black text-emerald-600">Rp {{ number_format($order->subtotal ?? 0, 0, ',', '.') }}</span>
+                                        </div>
+
+                                        <!-- TOMBOL KONFIRMASI PESANAN DITERIMA -->
+                                        @if(strtolower($order->status) === 'dikirim')
+                                            <form action="{{ route('buyer.orders.complete', $order->id) }}" method="POST">
+                                                @csrf
+                                                @method('PATCH')
+                                                <!-- PERBAIKAN WARNA TOMBOL DI SINI: diganti menjadi bg-emerald-600 -->
+                                                <button type="submit" onclick="return confirm('Apakah Anda yakin pesanan sudah diterima dengan baik? Dana akan diteruskan ke penjual.')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold py-2 px-4 rounded-xl shadow-soft transition">
+                                                    Pesanan Diterima
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -113,6 +133,7 @@
             </div>
         </div>
 
+        <!-- Modal Ulasan (Tetap sama) -->
         <div x-show="showReviewModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div x-show="showReviewModal" x-transition.opacity class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" @click="showReviewModal = false" aria-hidden="true"></div>
@@ -129,7 +150,6 @@
                     
                     <form :action="'/produk-detail/' + productId + '/ulasan'" method="POST">
                         @csrf
-                        <!-- Mengirimkan ID Pesanan ke Controller -->
                         <input type="hidden" name="order_id" :value="orderId">
                         
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">

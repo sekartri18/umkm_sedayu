@@ -21,6 +21,9 @@ class Umkm extends Model
         'maps_link',     // Link Google Maps
         'image',
         'status',        // Kolom verifikasi Admin (pending, approved, suspended)
+        'bank_name',      // Nama Bank
+        'bank_account',   // Nomor Rekening Bank    
+        'bank_owner',     // Nama Pemilik Rekening Bank
     ];
 
     // Definisi relasi: Sebuah UMKM dimiliki oleh 1 Kategori (BelongsTo)
@@ -42,5 +45,11 @@ class Umkm extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Relasi Riwayat Transaksi Keuangan
+    public function walletTransactions()
+    {
+        return $this->hasMany(WalletTransaction::class);
     }
 }

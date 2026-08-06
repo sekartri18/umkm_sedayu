@@ -45,10 +45,10 @@
     <div class="max-w-5xl mx-auto px-5 md:px-8 mt-6 md:mt-10">
         
         <!-- BAGIAN PRODUK UTAMA -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col md:flex-row mb-10">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-row items-stretch mb-10">
             
             <!-- Foto Produk -->
-            <div class="w-full md:w-1/2 bg-gray-100 aspect-square md:aspect-auto md:min-h-[500px] relative group">
+            <div class="w-[45%] sm:w-[46%] md:w-1/2 bg-gray-100 aspect-[4/5] sm:aspect-square md:aspect-auto md:min-h-[500px] relative group shrink-0">
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 @else
@@ -59,17 +59,17 @@
             </div>
 
             <!-- Detail Produk -->
-            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col">
+            <div class="w-[55%] sm:w-[54%] md:w-1/2 p-3 sm:p-5 md:p-10 flex flex-col">
                 <div class="flex-1">
                     <a href="{{ route('umkm.show', $product->umkm->id) }}" class="inline-flex items-center gap-2 mb-4 text-sm font-semibold text-emerald-600 hover:text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         {{ $product->umkm->name }}
                     </a>
                     
-                    <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">{{ $product->name }}</h1>
+                    <h1 class="text-lg sm:text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">{{ $product->name }}</h1>
                     
-                    <div class="flex items-center gap-4 mb-6">
-                        <span class="text-3xl font-black text-primary">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+                        <span class="text-xl sm:text-3xl font-black text-primary">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                         @if($product->stock > 0)
                             <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded-md">Stok: {{ $product->stock }}</span>
                         @else
@@ -84,28 +84,28 @@
                 </div>
 
                 <!-- Aksi Beli -->
-                <div class="mt-8 pt-6 border-t border-gray-100">
-                    <div class="flex gap-3">
+                <div class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         @if($product->stock > 0)
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                 @csrf
-                                <button type="submit" class="w-full bg-white border-2 border-primary text-primary hover:bg-emerald-50 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                    Masukkan Keranjang
+                                <button type="submit" class="w-full bg-white border border-primary text-primary hover:bg-emerald-50 font-semibold py-2.5 sm:py-3.5 px-3 sm:px-6 rounded-xl transition flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    <span class="whitespace-nowrap">Masukkan Keranjang</span>
                                 </button>
                             </form>
                         @else
-                            <button disabled class="w-full bg-gray-200 text-gray-500 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                Maaf, Stok Sedang Habis
+                            <button disabled class="w-full bg-gray-200 text-gray-500 font-semibold py-2.5 sm:py-3.5 px-3 sm:px-6 rounded-xl cursor-not-allowed flex items-center justify-center gap-1.5 sm:gap-2 text-sm sm:text-base">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                <span class="whitespace-nowrap">Stok Habis</span>
                             </button>
                         @endif
 
                         @auth
-                            <form action="{{ route('buyer.favorites.toggle', $product->id) }}" method="POST">
+                            <form action="{{ route('buyer.favorites.toggle', $product->id) }}" method="POST" class="shrink-0">
                                 @csrf
-                                <button type="submit" aria-label="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" title="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" class="h-full rounded-xl border px-3 py-3.5 transition {{ $isFavorited ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50' }}">
-                                    <svg class="w-5 h-5" fill="{{ $isFavorited ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <button type="submit" aria-label="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" title="{{ $isFavorited ? 'Hapus dari favorit' : 'Tambah ke favorit' }}" class="h-full rounded-xl border px-2.5 sm:px-3 py-2.5 sm:py-3.5 transition {{ $isFavorited ? 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50' }}">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="{{ $isFavorited ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.53L12 21.35z"></path>
                                     </svg>
                                 </button>
@@ -145,7 +145,15 @@
                         <p class="text-gray-600 text-sm ml-13 pl-13">{{ $review->comment }}</p>
                         @if($review->review_photo)
                             <div class="mt-3 ml-13 pl-13">
-                                <img src="{{ asset('storage/' . $review->review_photo) }}" alt="Foto Ulasan dari {{ $review->user->name }}" class="w-full max-w-xs rounded-2xl shadow-sm border border-gray-200 object-cover">
+                                <img src="{{ asset('storage/' . $review->review_photo) }}" alt="Foto Ulasan dari {{ $review->user->name }}" class="w-full max-w-[180px] sm:max-w-[220px] h-32 sm:h-40 rounded-2xl shadow-sm border border-gray-200 object-cover">
+                            </div>
+                        @endif
+                        @if($review->review_video)
+                            <div class="mt-3 ml-13 pl-13">
+                                <video controls class="w-full max-w-[280px] sm:max-w-[320px] rounded-2xl shadow-sm border border-gray-200 bg-black">
+                                    <source src="{{ asset('storage/' . $review->review_video) }}" type="video/mp4">
+                                    Browser Anda tidak mendukung pemutaran video.
+                                </video>
                             </div>
                         @endif
                     </div>

@@ -17,6 +17,7 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
             'review_photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'review_video' => 'nullable|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,video/webm|max:5120',
         ]);
 
         // Pastikan pesanan ini benar-benar milik user yang sedang login
@@ -39,6 +40,13 @@ class ReviewController extends Controller
                 Storage::disk('public')->delete($review->review_photo);
             }
             $review->review_photo = $request->file('review_photo')->store('reviews', 'public');
+        }
+
+        if ($request->hasFile('review_video')) {
+            if ($review->review_video) {
+                Storage::disk('public')->delete($review->review_video);
+            }
+            $review->review_video = $request->file('review_video')->store('reviews', 'public');
         }
 
         $review->rating = $request->rating;

@@ -179,7 +179,11 @@
                                     <div class="mb-4 text-left">
                                         <label for="review_photo" class="block text-sm font-bold text-gray-700 mb-2">Foto Ulasan (opsional)</label>
                                         <input id="review_photo" type="file" name="review_photo" accept="image/*" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
-                                        <p class="text-xs text-gray-500 mt-1">Unggah foto produk untuk mendukung ulasan Anda. Maksimal 4MB.</p>
+                                    </div>
+                                    <div class="mb-4 text-left">
+                                        <label for="review_video" class="block text-sm font-bold text-gray-700 mb-2">Video Ulasan (opsional)</label>
+                                        <input id="review_video" type="file" name="review_video" accept="video/*" class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+                                        <p class="text-xs text-gray-500 mt-1">Unggah foto atau video untuk mendukung ulasan Anda. Batas video maksimal 5MB.</p>
                                     </div>
                                 </div>
                             </div>

@@ -9,8 +9,8 @@ class Review extends Model
 {
     use HasFactory;
     
-    // Tambahkan order_id dan review_photo di sini
-    protected $fillable = ['user_id', 'product_id', 'order_id', 'rating', 'comment', 'review_photo'];
+    // Tambahkan order_id, review_photo, dan review_video di sini
+    protected $fillable = ['user_id', 'product_id', 'order_id', 'rating', 'comment', 'review_photo', 'review_video'];
 
     public function user() {
         return $this->belongsTo(User::class);

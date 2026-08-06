@@ -64,11 +64,11 @@
     @endif
 
     <!-- 2. Cover Image -->
-    <div class="w-full h-64 bg-gray-300 mt-16 relative">
+    <div class="w-full h-36 sm:h-48 md:h-56 bg-gray-300 mt-16 relative">
         @if($umkm->image)
-            <img src="{{ asset('storage/' . $umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+            <img src="{{ asset('storage/' . $umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover object-center">
         @else
-            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover object-center">
         @endif
         <div class="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
     </div>
@@ -125,9 +125,9 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                         <!-- Bungkus area gambar dan judul dengan link ke detail produk -->
                         <a href="{{ route('product.show', $product->id) }}" class="block group">
-                            <div class="h-36 sm:h-40 lg:h-48 bg-gray-200 overflow-hidden">
+                            <div class="h-24 sm:h-28 md:h-32 lg:h-36 bg-gray-200 overflow-hidden">
                                 @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-300">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300">
                                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>

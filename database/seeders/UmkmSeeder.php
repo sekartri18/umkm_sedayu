@@ -11,9 +11,22 @@ class UmkmSeeder extends Seeder
     public function run(): void
     {
         // 1. Membuat Kategori
-        $kategoriMakanan = Category::create(['name' => 'Makanan', 'slug' => 'makanan']);
-        $kategoriPakaian = Category::create(['name' => 'Pakaian', 'slug' => 'pakaian']);
-        $kategoriKerajinan = Category::create(['name' => 'Kerajinan', 'slug' => 'kerajinan']);
+        $kategoriMakanan = Category::firstOrCreate(
+            ['slug' => 'makanan'],
+            ['name' => 'Makanan']
+        );
+        $kategoriPakaian = Category::firstOrCreate(
+            ['slug' => 'pakaian'],
+            ['name' => 'Pakaian']
+        );
+        $kategoriTanaman = Category::firstOrCreate(
+            ['slug' => 'tanaman'],
+            ['name' => 'Tanaman']
+        );
+        $kategoriKerajinan = Category::firstOrCreate(
+            ['slug' => 'kerajinan'],
+            ['name' => 'Kerajinan']
+        );
 
         // 2. Membuat Data UMKM Contoh
         Umkm::create([

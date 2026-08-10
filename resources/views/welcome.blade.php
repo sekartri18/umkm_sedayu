@@ -219,7 +219,11 @@
                         @endphp
                         <a href="{{ route('umkm.list', ['search' => $category->name]) }}" class="flex flex-col items-center gap-2 md:gap-3 shrink-0 snap-start group w-20 md:w-full">
                             <div class="w-16 h-16 md:w-24 md:h-24 rounded-full bg-emerald-50 flex items-center justify-center text-3xl md:text-4xl border border-emerald-100 shadow-sm group-hover:bg-primary group-hover:shadow-md transition duration-300">
-                                <span class="group-hover:scale-110 transition-transform">{{ $icon }}</span>
+                                @if($catKey === 'tanaman')
+                                    <img src="{{ asset('images/pot-tanaman.svg') }}" alt="Tanaman" class="w-10 h-10 md:w-12 md:h-12 object-contain" />
+                                @else
+                                    <span class="group-hover:scale-110 transition-transform">{{ $icon }}</span>
+                                @endif
                             </div>
                             <span class="text-[11px] md:text-sm font-semibold text-gray-700 group-hover:text-primary text-center leading-tight">{{ $category->name }}</span>
                         </a>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminCategoryController extends Controller
 {
@@ -20,7 +21,19 @@ class AdminCategoryController extends Controller
             'icon' => 'nullable|string|max:10' // Untuk emoji
         ]);
 
-        Category::create($request->all());
+        $slug = Str::slug($request->name);
+        $baseSlug = $slug;
+        $counter = 1;
+        while (Category::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        Category::create([
+            'name' => $request->name,
+            'slug' => $slug,
+            'icon' => $request->icon,
+        ]);
+
         return back()->with('success', 'Kategori baru berhasil ditambahkan!');
     }
 
@@ -36,7 +49,19 @@ class AdminCategoryController extends Controller
             'icon' => 'nullable|string|max:10'
         ]);
 
-        $category->update($request->all());
+        $slug = Str::slug($request->name);
+        $baseSlug = $slug;
+        $counter = 1;
+        while (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $category->update([
+            'name' => $request->name,
+            'slug' => $slug,
+            'icon' => $request->icon,
+        ]);
+
         return redirect()->route('admin.category.index')->with('success', 'Kategori berhasil diperbarui!');
     }
 

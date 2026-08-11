@@ -66,7 +66,7 @@
     <!-- 2. Cover Image -->
     <div class="w-full h-36 sm:h-48 md:h-56 bg-gray-300 mt-16 relative">
         @if($umkm->image)
-            <img src="{{ asset('storage/' . $umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover object-center">
+            <img src="{{ asset($umkm->image) }}" alt="{{ $umkm->name }}" class="w-full h-full object-cover object-center">
         @else
             <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" alt="{{ $umkm->name }}" class="w-full h-full object-cover object-center">
         @endif
@@ -127,7 +127,7 @@
                         <a href="{{ route('product.show', $product->id) }}" class="block group">
                             <div class="h-24 sm:h-28 md:h-32 lg:h-36 bg-gray-200 overflow-hidden">
                                 @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-300">
+                                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-300">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-300">
                                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -174,7 +174,8 @@
             @php
                 $namaPembeli = auth()->user()->name;
                 $pesan = "Halo " . $umkm->owner_name . " (" . $umkm->name . "), saya " . $namaPembeli . " tertarik untuk melakukan pemesanan atau bertanya lebih lanjut mengenai produk Anda.";
-                $actionUrl = "https://wa.me/" . $umkm->whatsapp_number . "?text=" . urlencode($pesan);
+                $waNumber = preg_replace('/\D/', '', ltrim($umkm->whatsapp_number ?? '', '+'));
+                $actionUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($pesan);
                 $target = "_blank";
                 $teksTombol = "Hubungi Penjual via WhatsApp";
             @endphp

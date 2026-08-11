@@ -1,14 +1,5 @@
 <div x-data="{ open: false }">
-    <!-- CSS Pintar untuk menyesuaikan konten utama dengan lebar Sidebar -->
-    <!-- (Agar kamu tidak perlu repot mengedit file layout lainnya!) -->
-    <style>
-        @media (min-width: 1024px) {
-            main, header.bg-white {
-                padding-left: 16rem !important; /* Menggeser selebar w-64 */
-                transition: padding-left 0.3s ease-in-out;
-            }
-        }
-    </style>
+    <!-- Sidebar is fixed; content should be shifted with utility classes on main/header (avoid global CSS here) -->
 
     <!-- 1. MOBILE TOPBAR (Hanya tampil di layar kecil / HP) -->
     <div class="lg:hidden bg-white border-b border-gray-100 px-4 py-3 flex justify-between items-center z-20 relative shadow-sm no-print">

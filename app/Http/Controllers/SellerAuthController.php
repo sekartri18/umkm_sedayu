@@ -9,6 +9,7 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SellerAuthController extends Controller
 {
@@ -29,7 +30,7 @@ class SellerAuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'umkm_name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'whatsapp_number' => 'required|string|max:20',
+            'whatsapp_number' => ['required', 'string', 'max:20', 'regex:/^(\+?62|0)[0-9\s\-]{6,}$/'],
             'address' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
@@ -45,7 +46,13 @@ class SellerAuthController extends Controller
         // 3. Buat Profil Toko (UMKM) disambungkan ke Akun tadi
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('umkm', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            if (!file_exists(public_path('umkm'))) {
+                mkdir(public_path('umkm'), 0755, true);
+            }
+            $file->move(public_path('umkm'), $filename);
+            $imagePath = 'umkm/' . $filename;
         }
 
         Umkm::create([

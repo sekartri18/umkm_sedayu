@@ -1,8 +1,8 @@
 <x-buyer-layout>
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="lg:-ml-64">
-                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100 p-6 sm:p-8 lg:pl-8">
+        <div class="w-full">
+            <div>
+                <div class="bg-white overflow-hidden shadow-sm rounded-2xl border border-gray-100 p-6 sm:p-8">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
                             <h2 class="text-2xl font-bold text-gray-900">Barang Favorit</h2>
@@ -25,7 +25,7 @@
                                     <a href="{{ route('product.show', $product->id) }}" class="block">
                                         <div class="h-44 bg-gray-100 overflow-hidden">
                                             @if($product->image)
-                                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                                                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                                             @endif
                                         </div>
                                         <div class="p-5">

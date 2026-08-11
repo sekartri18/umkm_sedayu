@@ -50,7 +50,7 @@
             <!-- Foto Produk -->
             <div class="w-[45%] sm:w-[46%] md:w-1/2 bg-gray-100 aspect-[4/5] sm:aspect-square md:aspect-auto md:min-h-[500px] relative group shrink-0">
                 @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                    <img src="{{ asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
                 @else
                     <div class="absolute inset-0 flex items-center justify-center text-gray-300">
                         <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -172,7 +172,7 @@
                         <a href="{{ route('product.show', $other->id) }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden block hover:-translate-y-1 hover:shadow-md transition-all">
                             <div class="h-32 md:h-40 bg-gray-100 relative">
                                 @if($other->image)
-                                    <img src="{{ asset('storage/' . $other->image) }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset($other->image) }}" class="w-full h-full object-cover">
                                 @endif
                             </div>
                             <div class="p-3 md:p-4">

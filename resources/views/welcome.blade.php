@@ -254,7 +254,7 @@
                         <a href="{{ route('umkm.show', $umkm->id) }}" class="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-gray-100 overflow-hidden block hover:-translate-y-1 hover:shadow-md transition-all">
                             <div class="h-32 md:h-40 bg-gray-100 relative">
                                 @if($umkm->image)
-                                    <img src="{{ asset('storage/' . $umkm->image) }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset($umkm->image) }}" class="w-full h-full object-cover">
                                 @else
                                     <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover opacity-50">
                                 @endif

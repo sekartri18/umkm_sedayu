@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class SellerProductController extends Controller
 {
@@ -123,7 +124,13 @@ class SellerProductController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            if (!file_exists(public_path('products'))) {
+                mkdir(public_path('products'), 0755, true);
+            }
+            $file->move(public_path('products'), $filename);
+            $imagePath = 'products/' . $filename;
         }
 
         Product::create([
@@ -175,10 +182,16 @@ class SellerProductController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+            if ($product->image && file_exists(public_path($product->image))) {
+                @unlink(public_path($product->image));
             }
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            if (!file_exists(public_path('products'))) {
+                mkdir(public_path('products'), 0755, true);
+            }
+            $file->move(public_path('products'), $filename);
+            $data['image'] = 'products/' . $filename;
         }
 
         $product->update($data);
@@ -195,8 +208,8 @@ class SellerProductController extends Controller
             abort(403);
         }
 
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+        if ($product->image && file_exists(public_path($product->image))) {
+            @unlink(public_path($product->image));
         }
 
         $product->delete();
@@ -288,7 +301,7 @@ class SellerProductController extends Controller
         // Validasi input form
         $request->validate([
             'name' => 'required|string|max:255',
-            'whatsapp_number' => 'nullable|string|max:20',
+            'whatsapp_number' => ['nullable', 'string', 'max:20', 'regex:/^(\+?62|0)[0-9\s\-]{6,}$/'],
             'address' => 'nullable|string',
             'maps_link' => 'nullable|url',
             
@@ -326,10 +339,16 @@ class SellerProductController extends Controller
 
         // Jika penjual mengunggah foto profil toko baru
         if ($request->hasFile('image')) {
-            if ($umkm->image) {
-                Storage::disk('public')->delete($umkm->image);
+            if ($umkm->image && file_exists(public_path($umkm->image))) {
+                @unlink(public_path($umkm->image));
             }
-            $data['image'] = $request->file('image')->store('umkm', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+            if (!file_exists(public_path('umkm'))) {
+                mkdir(public_path('umkm'), 0755, true);
+            }
+            $file->move(public_path('umkm'), $filename);
+            $data['image'] = 'umkm/' . $filename;
         }
 
         $umkm->update($data);

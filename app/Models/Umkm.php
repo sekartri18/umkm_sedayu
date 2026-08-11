@@ -26,6 +26,26 @@ class Umkm extends Model
         'bank_owner',     // Nama Pemilik Rekening Bank
     ];
 
+    public function setWhatsappNumberAttribute($value)
+    {
+        if (empty($value)) {
+            $this->attributes['whatsapp_number'] = null;
+            return;
+        }
+
+        $number = preg_replace('/[^0-9+]/', '', $value);
+
+        if (str_starts_with($number, '+')) {
+            $number = substr($number, 1);
+        }
+
+        if (str_starts_with($number, '0')) {
+            $number = '62' . substr($number, 1);
+        }
+
+        $this->attributes['whatsapp_number'] = $number;
+    }
+
     // Definisi relasi: Sebuah UMKM dimiliki oleh 1 Kategori (BelongsTo)
     public function category()
     {

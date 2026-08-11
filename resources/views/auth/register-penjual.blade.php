@@ -95,10 +95,9 @@
                             <div>
                                 <label for="whatsapp_number" class="block text-sm font-medium text-gray-700">Nomor WhatsApp Aktif</label>
                                 <div class="relative mt-1 rounded-md shadow-sm">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm pointer-events-none">+62</span>
-                                    <input type="text" name="whatsapp_number" id="whatsapp_number" value="{{ old('whatsapp_number') }}" placeholder="81234567890" required class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 pl-10 text-sm focus:border-primary focus:ring-primary outline-none transition">
+                                    <input type="text" name="whatsapp_number" id="whatsapp_number" value="{{ old('whatsapp_number') }}" placeholder="081234567890" required class="block w-full rounded-lg border-gray-300 bg-gray-50 border p-2.5 text-sm focus:border-primary focus:ring-primary outline-none transition">
                                 </div>
-                                <p class="text-[10px] text-gray-500 mt-1">Isi tanpa awalan 0, contoh: 812...</p>
+                                <p class="text-[10px] text-gray-500 mt-1">Isi dengan awalan 0, contoh: 081234567890</p>
                                 @error('whatsapp_number') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
                         </div>

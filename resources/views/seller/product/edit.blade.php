@@ -55,7 +55,7 @@
                             @if($product->image)
                                 <div class="mb-3">
                                     <p class="text-xs text-gray-500 mb-1">Foto saat ini:</p>
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="Foto lama" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                                    <img src="{{ asset($product->image) }}" alt="Foto lama" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
                                 </div>
                             @endif
 

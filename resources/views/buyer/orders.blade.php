@@ -1,13 +1,7 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Pesanan Saya') }}
-        </h2>
-    </x-slot>
-
+<x-buyer-layout>
     <!-- Tambahkan orderId di dalam state Alpine.js -->
     <div class="py-12" x-data="{ showReviewModal: false, productId: '', productName: '', orderId: '', openOrder: null }">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="w-full">
             
             @if(session('success'))
                 <div class="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3 text-sm font-bold shadow-sm flex items-center gap-2">
@@ -201,4 +195,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-buyer-layout>
